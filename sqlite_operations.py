@@ -1,40 +1,35 @@
 import sqlite3
 from util import *
+import streamlit as st
+import pyodbc
 
-# raw string database path
-db_path = r"C:\Users\wasme\Desktop\database\pnp_characters.db"
-
-# Connect to the SQLite database
-conn = sqlite3.connect(db_path)
-c = conn.cursor()
-c.execute('''
-    CREATE TABLE IF NOT EXISTS secondary_info (
-        id INTEGER,
-        nahkampf INTEGER,
-        fernkampf INTEGER,
-        parieren INTEGER,
-        entweichen INTEGER,
-        zähigkeit INTEGER,
-        ausweichen INTEGER,
-        tarnung INTEGER,
-        fingerfertigkeit INTEGER,
-        schnelligkeit INTEGER,
-        nachsetzen INTEGER,
-        luegen INTEGER,
-        etikette INTEGER,
-        handeln INTEGER,
-        ueberzeugen INTEGER,
-        einschuechtern INTEGER,
-        mechanik INTEGER,
-        aetherkunde INTEGER,
-        xenos INTEGER,
-        handwerk INTEGER,
-        steuerung INTEGER,
-        FOREIGN KEY (id) REFERENCES primary_info (id)
+# Initialize connection.
+# Uses st.cache_resource to only run once.
+@st.cache_resource
+def init_connection():
+    return pyodbc.connect(
+        "DRIVER={ODBC Driver 17 for SQL Server};SERVER="
+        + st.secrets["AZURE_SQL"]["SERVER"]
+        + ";DATABASE="
+        + st.secrets["AZURE_SQL"]["DATABASE"]
+        + ";UID="
+        + st.secrets["AZURE_SQL"]["USERNAME"]
+        + ";PWD="
+        + st.secrets["AZURE_SQL"]["PASSWORD"]
     )
-''')
 
+conn = init_connection()
 
-# Save (commit) the changes and close the connection
-conn.commit()
-conn.close()
+# Perform query.
+# Uses st.cache_data to only rerun when the query changes or after 10 min.
+@st.cache_data(ttl=600)
+def run_query(query):
+    with conn.cursor() as cur:
+        cur.execute(query)
+        return cur.fetchall()
+
+rows = run_query("SELECT * from mytable;")
+
+# Print results.
+for row in rows:
+    st.write(f"{row[0]} has a :{row[1]}:")
