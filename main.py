@@ -1,7 +1,11 @@
 import streamlit as st
 import sqlite3 as sql3
 from streamlit import session_state as ss
+import os
 from util import *
+
+username = os.environ.get('AZURE_SQL_USERNAME')
+password = os.environ.get('AZURE_SQL_PASSWORD')
 
 # raw string database path
 db_path = r"C:\Users\wasme\Desktop\database\pnp_characters.db"
