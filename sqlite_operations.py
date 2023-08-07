@@ -39,7 +39,7 @@ def insert_into_race(names):
 
 
 # Names to insert
-race_names = ["Klonkrieger", "Cyborg", "Zelot", "Tech-Priest", "Medium", "Zivilist"]
+race_names = ["Test"]
 
 # Execute the insertion
 insert_into_race(race_names)
