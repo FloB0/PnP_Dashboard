@@ -1,13 +1,21 @@
 import streamlit as st
 import sqlite3 as sql3
+import mysql.connector
 from streamlit import session_state as ss
 
-# raw string database path
-db_path = r"C:\Users\wasme\Desktop\database\pnp_characters.db"
+
+@st.cache_resource
+def init_connection():
+    return mysql.connector.connect(
+        host=st.secrets["AZURE_SQL"]["SERVER"],
+        database=st.secrets["AZURE_SQL"]["DATABASE"],
+        user=st.secrets["AZURE_SQL"]["USERNAME"],
+        password=st.secrets["AZURE_SQL"]["PASSWORD"]
+    )
 
 
 def get_values(table_name):
-    conn = sql3.connect(db_path)
+    conn = init_connection()
     c = conn.cursor()
 
     sql = f'SELECT name FROM {table_name}'
@@ -21,10 +29,22 @@ def get_values(table_name):
 
 
 def insert_into_table(table_name, name):
-    conn = sql3.connect(db_path)
+    """
+    Inserts into a table, and checks if the table is valid
+    table_name: name of a table in the database
+    name: value to add as name
+    """
+    conn = init_connection()
     c = conn.cursor()
 
-    sql = f'INSERT INTO {table_name} (name) VALUES (?)'
+    # Check if table exists in the database
+    c.execute('SHOW TABLES LIKE %s', (table_name,))
+    result = c.fetchone()
+    if result is None:
+        print(f"Table {table_name} does not exist.")
+        return
+
+    sql = f'INSERT INTO {table_name} (name) VALUES (%s)'
     c.execute(sql, (name,))
 
     conn.commit()
@@ -32,24 +52,39 @@ def insert_into_table(table_name, name):
 
 
 def update_character(table, character_id, updated_values):
-    # Connect to the SQLite database
-    conn = sql3.connect(db_path)
+    # Connect to the MySQL database
+    conn = init_connection()
     c = conn.cursor()
 
+    # Check if table exists in the database
+    c.execute('SHOW TABLES LIKE %s', (table,))
+    result = c.fetchone()
+    if result is None:
+        print(f"Table {table} does not exist.")
+        return
+
+    # Check if provided columns exist in the table
+    c.execute(f'SHOW COLUMNS FROM {table}')
+    existing_columns = [column[0] for column in c.fetchall()]
+    for column in updated_values.keys():
+        if column not in existing_columns:
+            print(f"Column {column} does not exist in table {table}.")
+            return
+
     # Check if record exists
-    c.execute(f'SELECT * FROM {table} WHERE id = ?', (character_id,))
+    c.execute(f'SELECT * FROM {table} WHERE id = %s', (character_id,))
     record = c.fetchone()
 
     if record is None:
         # If record does not exist, insert new record
         columns = ', '.join(['id'] + list(updated_values.keys()))
-        placeholders = ', '.join(['?'] * (len(updated_values) + 1))
+        placeholders = ', '.join(['%s'] * (len(updated_values) + 1))
         sql = f'INSERT INTO {table} ({columns}) VALUES ({placeholders})'
         c.execute(sql, (character_id,) + tuple(updated_values.values()))
     else:
         # If record exists, update it
-        columns = ', '.join(f'{key} = ?' for key in updated_values.keys())
-        sql = f'UPDATE {table} SET {columns} WHERE id = ?'
+        columns = ', '.join(f'{key} = %s' for key in updated_values.keys())
+        sql = f'UPDATE {table} SET {columns} WHERE id = %s'
         c.execute(sql, tuple(updated_values.values()) + (character_id,))
 
     # Save (commit) the changes and close the connection
@@ -59,13 +94,29 @@ def update_character(table, character_id, updated_values):
 
 # inserts a new character to the database
 def insert_character(character):
-    # Connect to the SQLite database
-    conn = sql3.connect(db_path)
+    # Connect to the MySQL database
+    conn = init_connection()
     c = conn.cursor()
+
+    # Check if table exists in the database
+    table = "primary_info"
+    c.execute('SHOW TABLES LIKE %s', (table,))
+    result = c.fetchone()
+    if result is None:
+        print(f"Table {table} does not exist.")
+        return
+
+    # Check if provided columns exist in the table
+    c.execute(f'SHOW COLUMNS FROM {table}')
+    existing_columns = [column[0] for column in c.fetchall()]
+    for column in character.keys():
+        if column not in existing_columns:
+            print(f"Column {column} does not exist in table {table}.")
+            return
 
     # Prepare the SQL INSERT statement
     columns = ', '.join(character.keys())
-    placeholders = ', '.join('?' * len(character))
+    placeholders = ', '.join(['%s'] * len(character))
     sql = f'INSERT INTO primary_info ({columns}) VALUES ({placeholders})'
 
     # Execute the INSERT statement with the character attributes as the parameters
@@ -77,13 +128,13 @@ def insert_character(character):
 
 
 # fetch character data by id
-def get_character_by_id(id):
-    # Connect to the SQLite database
-    conn = sql3.connect(db_path)
+def get_character_by_id(in_id):
+    # Connect to the MySQL database
+    conn = init_connection()
     c = conn.cursor()
 
     # Execute a query to fetch the character record with the specified id
-    c.execute(f"SELECT * FROM primary_info WHERE id = ?", (id,))
+    c.execute(f"SELECT * FROM primary_info WHERE id = %s", (in_id,))
 
     # Fetch the record
     record = c.fetchone()
@@ -136,7 +187,6 @@ def get_character_by_id(id):
 
     # If no record was found, return None
     return None
-    # Add more characters as needed
 
 
 def update_secondary(id):

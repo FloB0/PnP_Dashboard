@@ -3,17 +3,10 @@ from util import *
 import streamlit as st
 import pyodbc
 import mysql.connector
+from util import *
 
 # Initialize connection.
 # Uses st.cache_resource to only run once.
-@st.cache_resource
-def init_connection():
-    return mysql.connector.connect(
-        host=st.secrets["AZURE_SQL"]["SERVER"],
-        database=st.secrets["AZURE_SQL"]["DATABASE"],
-        user=st.secrets["AZURE_SQL"]["USERNAME"],
-        password=st.secrets["AZURE_SQL"]["PASSWORD"]
-    )
 
 conn = init_connection()
 
