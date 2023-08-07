@@ -251,7 +251,7 @@ def get_character_by_id(in_id):
                    'p',
                    'pb',
                    'v',
-                   'int',
+                   'intel',
                    'wk',
                    'wa',
                    'mb',
@@ -295,7 +295,7 @@ def get_character_by_id_alchemy(in_id):
     table = Table('primary_info', metadata, autoload_with=engine)
 
     # Construct the SELECT statement
-    stmt = select(table).where(table.c.id.eq(in_id))
+    stmt = select(table).where(table.c.id == in_id)
 
     # Execute the statement and fetch the result
     with engine.connect() as connection:
@@ -322,12 +322,12 @@ def update_secondary(id):
     nachsetzen = character['v'] + character['wk'] + character['ini'] + character['nachsetzen']
     luegen = character['mb'] + character['c'] * 2 + character['luegen']
     etikette = character['ins'] + character['wi'] + character['c'] + character['etikette']
-    handeln = character['int'] * 2 + character['g'] + character['handeln']
+    handeln = character['intel'] * 2 + character['g'] + character['handeln']
     ueberzeugen = character['wk'] * 2 + character['ins'] + character['ueberzeugen']
     einschuechtern = character['kk'] + character['a'] + character['c'] + character['einschuechtern']
     mechanik = character['tv'] * 2 + character['wi'] + character['mechanik']
-    aetherkunde = character['mb'] + character['int'] + character['wi'] + character['aetherkunde']
-    xenos = character['int'] + character['wi'] * 2 + character['xenos']
+    aetherkunde = character['mb'] + character['intel'] + character['wi'] + character['aetherkunde']
+    xenos = character['intel'] + character['wi'] * 2 + character['xenos']
     handwerk = character['p'] + character['tv'] * 2 + character['handwerk']
     steuerung = character['pb'] + character['tv'] + character['wi'] + character['steuerung']
     updated_values = {
@@ -368,12 +368,12 @@ def update_secondary_alchemy(id):
     nachsetzen = character['v'] + character['wk'] + character['ini'] + character['nachsetzen']
     luegen = character['mb'] + character['c'] * 2 + character['luegen']
     etikette = character['ins'] + character['wi'] + character['c'] + character['etikette']
-    handeln = character['int'] * 2 + character['g'] + character['handeln']
+    handeln = character['intel'] * 2 + character['g'] + character['handeln']
     ueberzeugen = character['wk'] * 2 + character['ins'] + character['ueberzeugen']
     einschuechtern = character['kk'] + character['a'] + character['c'] + character['einschuechtern']
     mechanik = character['tv'] * 2 + character['wi'] + character['mechanik']
-    aetherkunde = character['mb'] + character['int'] + character['wi'] + character['aetherkunde']
-    xenos = character['int'] + character['wi'] * 2 + character['xenos']
+    aetherkunde = character['mb'] + character['intel'] + character['wi'] + character['aetherkunde']
+    xenos = character['intel'] + character['wi'] * 2 + character['xenos']
     handwerk = character['p'] + character['tv'] * 2 + character['handwerk']
     steuerung = character['pb'] + character['tv'] + character['wi'] + character['steuerung']
     updated_values = {

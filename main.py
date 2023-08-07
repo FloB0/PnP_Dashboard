@@ -93,7 +93,7 @@ def app():
                             'p': p,
                             'pb': pb,
                             'v': v,
-                            'int': intel,
+                            'intel': intel,
                             'wk': wk,
                             'wa': wa,
                             'mb': mb,
@@ -110,7 +110,7 @@ def app():
         # Display character information
         character = get_character_by_id_alchemy(st.session_state.key)
         st.write('Character Details')
-        st.text(f"Name: {character['name']}", help= f"This value is calculated by KK({character['kk']}) + INT({character['int']})")
+        st.text(f"Name: {character['name']}", help= f"This value is calculated by KK({character['kk']}) + INT({character['intel']})")
         st.text(f"Rasse: {character['race']}")
         st.text(f"Klasse: {character['class']}")
 
