@@ -220,10 +220,10 @@ def insert_character_alchemy(character):
 
     # Use SQLAlchemy's insert() to build the insert statement
     stmt = insert(table).values(character)
-
     # Execute the statement
     with engine.connect() as connection:
         connection.execute(stmt)
+        connection.commit()
 
 
 def get_character_by_id(in_id):

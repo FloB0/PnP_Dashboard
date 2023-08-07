@@ -3,6 +3,7 @@ from util import *
 import streamlit as st
 import pyodbc
 import mysql.connector
+from sqlalchemy import create_engine, MetaData, Table, insert, exc
 from util import *
 
 # Initialize connection.
@@ -37,9 +38,55 @@ def insert_into_race(names):
         cursor.close()
         connection.close()
 
+def insert_into_race_alchemy(names):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the race table
+    race_table = Table('race', metadata, autoload_with=engine)
+
+    # Create a list of dictionaries to represent all the data to insert
+    data_to_insert = [{'name': name} for name in names]
+
+    # Use SQLAlchemy's insert() to build the insert statement
+    stmt = insert(race_table).values(data_to_insert)
+
+    # Execute the statement
+    with engine.connect() as connection:
+        connection.execute(stmt)
+
+
+def insert_into_race_alchemy_logging(names):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the race table
+    race_table = Table('race', metadata, autoload_with=engine)
+
+    # Create a list of dictionaries to represent all the data to insert
+    data_to_insert = [{'name': name} for name in names]
+
+    # Use SQLAlchemy's insert() to build the insert statement
+    stmt = insert(race_table).values(data_to_insert)
+    compiled_stmt = stmt.compile(engine)
+    sql_str = str(compiled_stmt)
+    params = compiled_stmt.params
+
+    print(f"Generated SQL: {sql_str}")
+    print(f"Parameters: {params}")
+
+    # Execute the statement and catch any SQLAlchemy exceptions
+    with engine.connect() as connection:
+        try:
+            result = connection.execute(stmt)
+            connection.commit()
+            print(f"Rows inserted: {result.rowcount}")
+        except Exception as e:
+            print(f"Error occurred: {e}")
+
 
 # Names to insert
-race_names = ["Test"]
+race_names = ["was commit the prob"]
 
 # Execute the insertion
-insert_into_race(race_names)
+insert_into_race_alchemy_logging(race_names)
