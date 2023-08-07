@@ -21,7 +21,7 @@ def app():
 
         if st.button('Log in') or st.session_state.button_clicked:
             # Try to get a character with the entered key as the id
-            character = get_character_by_id(st.session_state.key)
+            character = get_character_by_id_alchemy(st.session_state.key)
 
             # If a character was found, display their information
             if character is not None:
@@ -45,13 +45,13 @@ def app():
         if ss.show_form:
             with st.form(key='character_form'):
                 # fetch dropdown data
-                races = get_values('race')
-                classes = get_values('class')
+                races = get_values_alchemy('race')
+                #classes = get_values_alchemy('class')
 
                 st.write('Character Details')
                 name = st.text_input('Name')
                 race = st.selectbox('Rasse', races)
-                class_ = st.selectbox('Klasse', classes)
+                #class_ = st.selectbox('Klasse', classes)
 
                 c1, c2, c3 = st.columns(3)
                 with c1:
@@ -87,7 +87,7 @@ def app():
                         character = {
                             'name': name,
                             'race': race,
-                            'class': class_,
+                            #'class': class_,
                             'kk': kk,
                             'a': a,
                             'p': p,
@@ -104,11 +104,11 @@ def app():
                             'wi': wi,
                             'c': c
                         }
-                        insert_character(character)
+                        insert_character_alchemy(character)
                         st.success('Character created successfully!')
     else:
         # Display character information
-        character = get_character_by_id(st.session_state.key)
+        character = get_character_by_id_alchemy(st.session_state.key)
         st.write('Character Details')
         st.text(f"Name: {character['name']}", help= f"This value is calculated by KK({character['kk']}) + INT({character['int']})")
         st.text(f"Rasse: {character['race']}")
