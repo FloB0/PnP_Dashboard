@@ -226,7 +226,7 @@ def insert_character_alchemy(character):
         connection.commit()
 
 
-def get_character_by_id(in_id):
+def  get_character_by_id(in_id):
     # Connect to the MySQL database
     conn = init_connection()
     c = conn.cursor()
@@ -300,7 +300,7 @@ def get_character_by_id_alchemy(in_id):
     # Execute the statement and fetch the result
     with engine.connect() as connection:
         result = connection.execute(stmt).fetchone()
-
+    print(type(result))
     # If a record was found, return it as a dictionary
     if result is not None:
         return dict(result)
