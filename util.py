@@ -300,15 +300,14 @@ def get_character_by_id_alchemy(in_id):
     # Execute the statement and fetch the result
     with engine.connect() as connection:
         result = connection.execute(stmt).fetchone()
-    print(type(result))
+
     # If a record was found, return it as a dictionary
     if result is not None:
-        return_dict = dict(result)
-        print(type(return_dict))
-        return return_dict
+        return {column: value for column, value in result.items()}
 
     # If no record was found, return None
     return None
+
 
 def update_secondary(id):
     character = get_character_by_id(id)
