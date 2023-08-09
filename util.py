@@ -303,9 +303,9 @@ def get_character_by_id_alchemy(in_id):
 
     # If a record was found, return it as a dictionary
     if result is not None:
-        return {column: value for column, value in result.items()}
+        return {result._fields[i]: result[i] for i in range(len(result._fields))}
 
-    # If no record was found, return None
+        # If no record was found, return None
     return None
 
 
