@@ -303,7 +303,9 @@ def get_character_by_id_alchemy(in_id):
     print(type(result))
     # If a record was found, return it as a dictionary
     if result is not None:
-        return dict(result)
+        return_dict = dict(result)
+        print(type(return_dict))
+        return return_dict
 
     # If no record was found, return None
     return None
