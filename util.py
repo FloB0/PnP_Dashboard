@@ -36,18 +36,40 @@ def get_values(table_name):
     return values
 
 
-def get_values_alchemy(table_name):
+def get_values_alchemy(table_name, column_name):
     engine = init_connection_alchemy()
 
-    if table_name not in ["primary_info", "race"]:  # replace with your valid table names
+    # Your database name
+    db_name = st.secrets["AZURE_SQL"]["DATABASE"]  # replace with your actual database name
+
+    # Fetch valid table names from the database
+    with engine.connect() as connection:
+        result = connection.execute(
+            text(f"SELECT table_name FROM information_schema.tables WHERE table_schema = '{db_name}'"))
+        valid_tables = [row[0] for row in result.fetchall()]
+
+    # Validate table name
+    if table_name not in valid_tables:
         raise ValueError("Invalid table name")
 
-    sql = text(f"SELECT name FROM {table_name}")
+    # Fetch valid column names for the specified table from the database
+    with engine.connect() as connection:
+        result = connection.execute(text(
+            f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}' AND table_schema = '{db_name}'"))
+        valid_columns = [row[0] for row in result.fetchall()]
+
+    # Validate column name
+    if column_name not in valid_columns:
+        raise ValueError("Invalid column name")
+
+    # SQL command to select specified column from the specified table
+    sql = text(f"SELECT {column_name} FROM {table_name}")
 
     with engine.connect() as connection:
         result = connection.execute(sql)
         values = [row[0] for row in result.fetchall()]
 
+    print(values)
     return values
 
 

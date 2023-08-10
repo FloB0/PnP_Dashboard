@@ -45,7 +45,7 @@ def app():
         if ss.show_form:
             with st.form(key='character_form'):
                 # fetch dropdown data
-                races = get_values_alchemy('race')
+                races = get_values_alchemy('race', 'name')
                 #classes = get_values_alchemy('class')
 
                 st.write('Character Details')
