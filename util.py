@@ -2,6 +2,7 @@ import streamlit as st
 import sqlite3 as sql3
 import mysql.connector
 from sqlalchemy import create_engine, text, MetaData, Table, select, insert, update
+import time
 from streamlit import session_state as ss
 
 DATABASE_URI = f"mysql+mysqlconnector://{st.secrets['AZURE_SQL']['USERNAME']}:{st.secrets['AZURE_SQL']['PASSWORD']}@{st.secrets['AZURE_SQL']['SERVER']}/{st.secrets['AZURE_SQL']['DATABASE']}"
