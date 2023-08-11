@@ -112,11 +112,20 @@ def app():
                         st.success('Character created successfully!')
                         st.session_state.submitted = False
                         st.session_state.show_form = False
+                        st.toast("Character successfully addded", icon="✅")
+                        time.sleep(2)
                         st.experimental_rerun()
 
     else:
+        if get_character_by_name_alchemy(st.session_state.key) is None:
+            st.toast("Character is not valid anymore", icon="🚨")
+            st.session_state.logged_in = False
+            time.sleep(2)
+            st.experimental_rerun()
         #The user is logged in
         character = get_character_by_name_alchemy(st.session_state.key)
+        print(character)
+        print(type(character))
         st.title(f"{character['name']}")
         st.text(f"Strength: {character['kk']}")
         st.text(f"Intelligence: {character['nahkampf']}")  # replace with actual intelligence column

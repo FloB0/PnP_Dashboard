@@ -1,7 +1,7 @@
 import streamlit as st
 import sqlite3 as sql3
 import mysql.connector
-from sqlalchemy import create_engine, text, MetaData, Table, select, insert, update
+from sqlalchemy import create_engine, text, MetaData, Table, select, insert, update, delete
 import time
 from streamlit import session_state as ss
 
@@ -530,3 +530,22 @@ def show_character_submit_form():
 
 def on_submit_click():
     st.session_state.submitted = True
+
+
+def delete_character_alchemy(name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the table
+    table = Table('primary_info', metadata, autoload_with=engine)
+
+    # Build the delete statement based on the "name"
+    stmt = delete(table).where(table.c.name == name)
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    # Optionally, you can check the number of deleted rows:
+    print(f"Deleted {result.rowcount} rows.")
