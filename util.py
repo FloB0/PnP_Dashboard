@@ -331,6 +331,7 @@ def get_character_by_id_alchemy(in_id):
         # If no record was found, return None
     return None
 
+
 def get_character_by_name_alchemy(in_name):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -351,6 +352,7 @@ def get_character_by_name_alchemy(in_name):
 
         # If no record was found, return None
     return None
+
 
 def update_secondary(id):
     character = get_character_by_id(id)
@@ -448,6 +450,10 @@ def update_secondary_alchemy(id):
 
 # def update_primary(id):
 def show_character_submit_form():
+
+    if 'submitted' not in st.session_state:
+        st.session_state.submitted = False
+
     with st.form(key='character_form'):
         # fetch dropdown data
         races = get_values_alchemy('race', 'name')
@@ -482,15 +488,19 @@ def show_character_submit_form():
             c = st.number_input('Charisma', value=0, step=1)
 
         # Create the submit button
-        submitted = st.form_submit_button("Submit")
+        submitted = st.form_submit_button("Submit", on_click=on_submit_click)
 
         # If the submit button is clicked, insert the new character into the SQLite database
-        if submitted:
+        if st.session_state.get('submitted', False):
+            print("checkpoint7")
             if name == '':
+                print("checkpoint8")
                 st.warning('Please enter a name before submitting.')
             elif name in get_values_alchemy('primary_info', 'name'):
+                print("checkpoint9")
                 st.warning('Name already taken. Please try something else')
             else:
+                print("checkpoint10")
                 character = {
                     'name': name,
                     'race': race,
@@ -513,4 +523,10 @@ def show_character_submit_form():
                 }
                 insert_character_alchemy(character)
                 st.success('Character created successfully!')
-                return False
+                print("checkpoint11")
+                st.session_state.submitted = False
+                return
+
+
+def on_submit_click():
+    st.session_state.submitted = True
