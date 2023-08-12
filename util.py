@@ -572,3 +572,22 @@ def delete_character_alchemy(name):
 
     # Optionally, you can check the number of deleted rows:
     print(f"Deleted {result.rowcount} rows.")
+
+
+def delete_data_alchemy(table_name, name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the table
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Build the delete statement based on the "name"
+    stmt = delete(table).where(table.c.name == name)
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    # Optionally, you can check the number of deleted rows:
+    print(f"Deleted {result.rowcount} rows.")
