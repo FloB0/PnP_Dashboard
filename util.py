@@ -116,6 +116,7 @@ def insert_into_table_alchemy(table_name, name):
         insert_stmt = table.insert().values(name=name)
 
         connection.execute(insert_stmt)
+        connection.commit()
 
 
 def update_character(table, character_id, updated_values):

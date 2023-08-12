@@ -11,6 +11,7 @@ from util import *
 
 conn = init_connection()
 
+
 # Perform query.
 # Uses st.cache_data to only rerun when the query changes or after 10 min.
 @st.cache_data(ttl=600)
@@ -37,6 +38,7 @@ def insert_into_race(names):
     finally:
         cursor.close()
         connection.close()
+
 
 def insert_into_race_alchemy(names):
     engine = init_connection_alchemy()
@@ -86,7 +88,9 @@ def insert_into_race_alchemy_logging(names):
 
 
 # Names to insert
-race_names = ["was commit the prob"]
+class_names = ["Klonkrieger", "Cyborg", "Zelot", "Tech-Priest", "Medium", "Zivilist"]
 
 # Execute the insertion
-insert_into_race_alchemy_logging(race_names)
+for name in class_names:
+    print(name)
+    insert_into_table_alchemy("classes", name)
