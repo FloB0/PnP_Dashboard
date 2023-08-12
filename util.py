@@ -250,6 +250,28 @@ def insert_character_alchemy(character):
         connection.commit()
 
 
+def insert_data_alchemy(table_name, data):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the table
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Check if provided columns exist in the table
+    existing_columns = set(column.name for column in list(table.columns))
+    for column in table_name.keys():
+        if column not in existing_columns:
+            print(f"Column {column} does not exist in table primary_info.")
+            return
+
+    # Use SQLAlchemy's insert() to build the insert statement
+    stmt = insert(table).values(data)
+    # Execute the statement
+    with engine.connect() as connection:
+        connection.execute(stmt)
+        connection.commit()
+
+
 def get_character_by_id(in_id):
     # Connect to the MySQL database
     conn = init_connection()
