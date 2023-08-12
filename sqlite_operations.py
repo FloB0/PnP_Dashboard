@@ -89,8 +89,59 @@ def insert_into_race_alchemy_logging(names):
 
 # Names to insert
 class_names = ["Klonkrieger", "Cyborg", "Zelot", "Tech-Priest", "Medium", "Zivilist"]
+items_to_add = [
+    {
+        'id': 2,
+        'name': "Improvisierte Keule",
+        'image_url': "https://res.cloudinary.com/dlzncrunt/image/upload/f_auto,q_auto/improvisierte_keule_1_d125xb",
+        'description': "Ein dicker und langer Gegenstand, der beträchtlichen Schaden anrichten kann ;)"
+    },
+    {
+        'id': 3,
+        'name': "Improvisierte Keule",
+        'image_url': "https://res.cloudinary.com/dlzncrunt/image/upload/f_auto,q_auto/improvisierte_keule_2_b1weab",
+        'description': "Trifft man damit einen stark gepanzerten Gegner, macht das ein befriedigendes \"GONG\""
+    },
+    {
+        'id': 4,
+        'name': "Ein Beil",
+        'image_url': "https://res.cloudinary.com/dlzncrunt/image/upload/f_auto,q_auto/ein_beil_v448i7",
+        'description': "Diese Waffe erscheint mir sehr primitiv für die Zukunft"
+    },
+    {
+        'id': 5,
+        'name': "Alien-Häcksler",
+        'image_url': "https://res.cloudinary.com/dlzncrunt/image/upload/f_auto,q_auto/alien_häcksler_l8w0rs",
+        'description': "\"Teile und Herrsche\", in diem Fall ist Feinde zerteilen gemeint"
+    },
+    {
+        'id': 6,
+        'name': "Mittelmäßiges Schwert",
+        'image_url': "https://res.cloudinary.com/dlzncrunt/image/upload/f_auto,q_auto/mittelmäßiges_schwert_tebfht",
+        'description': "Es kann eben nicht nur geile Items geben..."
+    },
+    {
+        'id': 7,
+        'name': "Space-Schraubenschlüssel",
+        'image_url': "https://res.cloudinary.com/dlzncrunt/image/upload/f_auto,q_auto/space_schraubenzieher_ysv4le",
+        'description': "Theoretisch ist das ja ein SchraubenDREHER, aber gut.. Hauptsache man kann damit töten"
+    },
+    {
+        'id': 8,
+        'name': "Rostige Stange",
+        'image_url': "https://res.cloudinary.com/dlzncrunt/image/upload/f_auto,q_auto/rostige_stange_kfwmp9",
+        'description': "hehe die kann man wieder glatt polieren und anderweitig benutzen"
+    },
+    {
+        'id': 9,
+        'name': "Infanterie-Schwert",
+        'image_url': "https://res.cloudinary.com/dlzncrunt/image/upload/f_auto,q_auto/infanterie_schwert_y6fo0g",
+        'description': "Wer etwas auf sich hält, der prügelt Feinde mit diesem Schwert kaputt"
+    }
+]
+
 
 # Execute the insertion
-for name in class_names:
-    print(name)
-    insert_into_table_alchemy("classes", name)
+for dict_item in items_to_add:
+    print(type(dict_item))
+    insert_data_alchemy('items', dict_item)

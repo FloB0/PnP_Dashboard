@@ -259,7 +259,7 @@ def insert_data_alchemy(table_name, data):
 
     # Check if provided columns exist in the table
     existing_columns = set(column.name for column in list(table.columns))
-    for column in table_name.keys():
+    for column in data.keys():
         if column not in existing_columns:
             print(f"Column {column} does not exist in table primary_info.")
             return
