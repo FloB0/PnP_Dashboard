@@ -2,6 +2,8 @@ import streamlit as st
 import sqlite3 as sql3
 import mysql.connector
 from sqlalchemy import create_engine, text, MetaData, Table, select, insert, update, delete
+from streamlit_elements import elements, dashboard, mui, editor, media, lazy, sync, nivo
+
 import time
 from streamlit import session_state as ss
 
@@ -703,3 +705,109 @@ def delete_item_from_character(character_id, item_name):
     # Here you call your previously created function
     decrement_or_delete_character_item(data)
 
+
+
+def get_items_for_character(characterID):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # We'll specifically target the 'character_items' table
+    table_name = 'character_items'
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Create the select statement to get all itemID and quantity for the specified characterID
+    stmt = select(table.c.itemID, table.c.quantity).where(table.c.characterID == characterID)
+
+
+    with engine.connect() as connection:
+        results = connection.execute(stmt).fetchall()
+
+        # Check if we have any results
+        if results:
+            # Convert the results into a dictionary format for easier access
+            items_dict = {row[0]: row[1] for row in results}
+            return items_dict
+        else:
+            print(f"No items found for characterID: {characterID}")
+            return {}
+
+
+def get_item_from_id(itemID):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # We'll specifically target the 'character_items' table
+    table_name = 'items'
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Create the select statement to get all itemID and quantity for the specified characterID
+    stmt = select(table.c.name, table.c.image_url, table.c.description).where(table.c.id == itemID)
+
+
+    with engine.connect() as connection:
+        results = connection.execute(stmt).fetchall()
+
+        # Check if we have any results
+        if results:
+            # Convert the results into a dictionary format for easier access
+            items_dict = results
+            return items_dict
+        else:
+            print(f"No items found for characterID: {itemID}")
+            return {}
+
+
+def get_layout_character_item(character_id):
+    items_from_character = get_items_for_character(character_id)
+    layout = []
+    layout_iterator = 0
+    layout_x = 0
+    layout_y = 0
+    for key in items_from_character:
+        quantity_iterator = 0
+        while quantity_iterator < items_from_character[key]:
+            dashboard_item = dashboard.Item(str(layout_iterator), layout_x, layout_y, 3, 4)
+            layout.append(dashboard_item)
+            quantity_iterator += 1
+            layout_iterator += 1
+            if layout_x < 9:
+                layout_x += 3
+            else:
+                layout_y += 4
+                layout_x = 0
+        print("print ",key)
+    print(items_from_character)
+    return layout
+
+
+def create_item_elements_for_character_id(characterID):
+    layout = get_layout_character_item(characterID)
+    print(layout)
+    items = get_items_for_character(characterID)
+    with elements("Dashboard Items"):
+        with dashboard.Grid(layout, draggableHandle=".draggable"):
+            for key in items:
+                quantity_iterator = 0
+                while quantity_iterator < items[key]:
+
+                    item_list = get_item_from_id(key)
+                    print(item_list)
+                    with mui.Card(key=quantity_iterator, sx={"display": "flex", "flexDirection": "column"}):
+                        mui.CardHeader(
+                            title=item_list[0][0],
+                            action=mui.IconButton(mui.icon.DeleteOutline),
+                            className="draggable"
+                        )
+                        mui.CardMedia(
+                            component="img",
+                            height=400,
+                            image=item_list[0][1],
+                            alt=item_list[0][0],
+                        )
+                        with mui.CardContent(sx={"flex": 1}):
+                            mui.Typography(item_list[0][2])
+
+                        quantity_iterator += 1
+
+
+create_item_elements_for_character_id(24)

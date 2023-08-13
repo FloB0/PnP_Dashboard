@@ -60,28 +60,29 @@ def app():
                 st.text(f"Charisma {character['c']}")
 
         with tab2:
-            with elements("dashboard"):
-                # You can create a draggable and resizable dashboard using
-                # any element available in Streamlit Elements.
-
-                from streamlit_elements import dashboard
-
-                # First, build a default layout for every element you want to include in your dashboard
-
-                layout = [
-                    # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
-                    dashboard.Item("first_item", 0, 0, 2, 2),
-                    dashboard.Item("second_item", 2, 0, 2, 2, isDraggable=True),
-                    dashboard.Item("third_item", 0, 2, 1, 1, isResizable=True),
-                ]
-
-                # Next, create a dashboard layout using the 'with' syntax. It takes the layout
-                # as first parameter, plus additional properties you can find in the GitHub links below.
-
-                with dashboard.Grid(layout):
-                    mui.Paper("First item", key="first_item")
-                    mui.Paper("Second item (cannot drag)", key="second_item")
-                    mui.Paper("Third item (cannot resize)", key="third_item")
+            create_item_elements_for_character_id(character["id"])
+            # with elements("dashboard"):
+            #     # You can create a draggable and resizable dashboard using
+            #     # any element available in Streamlit Elements.
+            #
+            #     from streamlit_elements import dashboard
+            #
+            #     # First, build a default layout for every element you want to include in your dashboard
+            #
+            #     layout = [
+            #         # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
+            #         dashboard.Item("first_item", 0, 0, 2, 2),
+            #         dashboard.Item("second_item", 2, 0, 2, 2, isDraggable=True),
+            #         dashboard.Item("third_item", 0, 2, 1, 1, isResizable=True),
+            #     ]
+            #
+            #     # Next, create a dashboard layout using the 'with' syntax. It takes the layout
+            #     # as first parameter, plus additional properties you can find in the GitHub links below.
+            #
+            #     with dashboard.Grid(layout):
+            #         mui.Paper("First item", key="first_item")
+            #         mui.Paper("Second item (cannot drag)", key="second_item")
+            #         mui.Paper("Third item (cannot resize)", key="third_item")
             st.divider()
             item_names = get_values_alchemy(table_name='items', column_name='name')
             item_to_add = st.selectbox('Add Item', item_names)
