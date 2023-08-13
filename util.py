@@ -37,7 +37,7 @@ def get_values(table_name):
     return values
 
 
-def get_values_alchemy(table_name, column_name):
+def get_values_alchemy(table_name: object, column_name: object) -> object:
     engine = init_connection_alchemy()
 
     # Your database name
@@ -591,3 +591,115 @@ def delete_data_alchemy(table_name, name):
 
     # Optionally, you can check the number of deleted rows:
     print(f"Deleted {result.rowcount} rows.")
+
+
+def insert_or_increment_character_item(data):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # The table name is hard-coded since we are specifically working with the 'Character_Items' table
+    table_name = 'character_items'
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Check if provided columns exist in the table
+    existing_columns = set(column.name for column in list(table.columns))
+    for column in data.keys():
+        if column not in existing_columns:
+            print(f"Column {column} does not exist in table {table_name}.")
+            return
+
+    # Manually constructing the SQL statement
+    sql = text(f"""
+        INSERT INTO {table_name} (characterID, itemID, quantity)
+        VALUES (:characterID, :itemID, 1)
+        ON DUPLICATE KEY UPDATE quantity = quantity + 1
+    """)
+
+    with engine.connect() as connection:
+        connection.execute(sql, data)
+        connection.commit()
+
+
+def get_id(table_name, name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Assuming the table where items are stored is named 'Items'
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Create the select statement to get the ItemID for a given item name
+    stmt = select(table.c.id).where(table.c.name == name)
+
+    with engine.connect() as connection:
+        result = connection.execute(stmt).fetchone()
+        if result:
+            return result[0]
+        else:
+            print(f"No ItemID found for item name: {name}")
+            return None
+
+
+def add_item_to_character(character_id, item_name):
+    item_id = get_id(table_name='items', name=item_name)
+
+    if not item_id:
+        return
+
+    data = {
+        "characterID": character_id,
+        "itemID": item_id
+    }
+
+    # Here you call your previously created function
+    insert_or_increment_character_item(data)
+
+
+def decrement_or_delete_character_item(data):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # The table name is hard-coded since we are specifically working with the 'character_items' table
+    table_name = 'character_items'
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Check if provided columns exist in the table
+    existing_columns = set(column.name for column in list(table.columns))
+    for column in data.keys():
+        if column not in existing_columns:
+            print(f"Column {column} does not exist in table {table_name}.")
+            return
+
+    # Decrement the quantity by 1, and if the quantity becomes zero, delete the row
+    with engine.connect() as connection:
+        # Decrement Quantity
+        sql = text(f"""
+            UPDATE {table_name} 
+            SET quantity = quantity - 1 
+            WHERE characterID = :characterID AND itemID = :itemID;
+        """)
+        connection.execute(sql, **data)
+
+        # Delete the row if Quantity is 0
+        del_stmt = delete(table).where(
+            (table.c.characterID == data['characterID']) &
+            (table.c.itemID == data['itemID']) &
+            (table.c.Quantity == 0)
+        )
+        connection.execute(del_stmt)
+        connection.commit()
+
+
+def delete_item_from_character(character_id, item_name):
+    item_id = get_id(item_name)
+
+    if not item_id:
+        return
+
+    data = {
+        "characterID": character_id,
+        "itemID": item_id
+    }
+
+    # Here you call your previously created function
+    decrement_or_delete_character_item(data)
+

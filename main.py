@@ -1,3 +1,5 @@
+import streamlit
+
 from util import *
 from streamlit_elements import elements, mui, html
 
@@ -11,19 +13,15 @@ def app():
     if 'logged_in' not in st.session_state:
         st.session_state.logged_in = False
 
-    print("st.session_state.logged_in: ",st.session_state.logged_in)
     if not st.session_state.logged_in:
         st.title("Character Dashboard")
         names_from_primary_info = get_values_alchemy('primary_info', 'name')
         st.session_state.key = st.selectbox("Select your character", names_from_primary_info)
         if st.button('Log in'):
-            print("button pressed")
             character = get_character_by_name_alchemy(st.session_state.key)
             # If a character was found, display their information
             if character is not None:
                 st.session_state.logged_in = True
-                print("character fetched")
-                print("st.session_state.logged_in insinde: ", st.session_state.logged_in)
                 st.experimental_rerun()
             else:
                 st.error('The key you entered is invalid')
@@ -53,12 +51,6 @@ def app():
                 st.text(f"Wahrnehmung {character['wa']}")
                 st.text(f"Mentale Belastbarkeit {character['mb']}")
                 st.text(f"Inspiration {character['ins']}")
-                # st.write('Psyche')
-                # intel = st.number_input('Intelligenz', value=0, step=1)
-                # wk = st.number_input('Willenskraft', value=0, step=1)
-                # wa = st.number_input('Wahrnehmung', value=0, step=1)
-                # mb = st.number_input('Mentale Belastbarkeit', value=0, step=1)
-                # ins = st.number_input('Inspiration', value=0, step=1)
             with c3:
                 st.text('Talente')
                 st.text(f"Initiative: {character['ini']}")
@@ -66,12 +58,6 @@ def app():
                 st.text(f"Glück {character['g']}")
                 st.text(f"Wissen {character['wi']}")
                 st.text(f"Charisma {character['c']}")
-                # st.write('Talente')
-                # ini = st.number_input('Initiative', value=0, step=1)
-                # tv = st.number_input('Technisches Verständnis', value=0, step=1)
-                # g = st.number_input('Glück', value=0, step=1)
-                # wi = st.number_input('Wissen', value=0, step=1)
-                # c = st.number_input('Charisma', value=0, step=1)
 
         with tab2:
             with elements("dashboard"):
@@ -96,13 +82,22 @@ def app():
                     mui.Paper("First item", key="first_item")
                     mui.Paper("Second item (cannot drag)", key="second_item")
                     mui.Paper("Third item (cannot resize)", key="third_item")
+            st.divider()
+            item_names = get_values_alchemy(table_name='items', column_name='name')
+            item_to_add = st.selectbox('Add Item', item_names)
+            if st.button("Add Item"):
+                add_item_to_character(character['id'], item_to_add)
+                st.toast("Item added to your character", icon="✅")
+                time.sleep(1)
+                st.experimental_rerun()
+
 
 
         with tab3:
             st.header("An owl")
             st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
 
-        if st.button('Go Back'):
+        if st.button('Log Out'):
             st.session_state.logged_in = False
             st.experimental_rerun()
 
