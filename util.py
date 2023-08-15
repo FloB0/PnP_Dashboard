@@ -805,6 +805,7 @@ def create_item_elements_for_character_id(characterID):
                         mui.CardMedia(
                             component="img",
                             height=400,
+                            width=300,
                             image=item_list[0][1],
                             alt=item_list[0][0],
                         )
@@ -815,5 +816,5 @@ def create_item_elements_for_character_id(characterID):
 
 
 
-create_item_elements_for_character_id(24)
-print(get_items_for_character(24))
+# create_item_elements_for_character_id(24)
+# print(get_items_for_character(24))

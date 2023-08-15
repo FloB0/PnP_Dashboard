@@ -1,14 +1,22 @@
-import streamlit
-
-from util import *
-from streamlit_elements import elements, mui, html
+import streamlit as st
 
 st.set_page_config(
-        page_title="DarkDystopia",
-        page_icon="🧊",
-        layout="wide",
-        initial_sidebar_state="collapsed"
+    page_title="DarkDystopia",
+    page_icon="🧊",
+    layout="wide",
+    initial_sidebar_state="collapsed"
 )
+st.markdown("""
+<style>
+.big-font {
+    font-size:20px !important;
+}
+</style>
+""", unsafe_allow_html=True)
+
+from util import *
+
+
 def app():
     if 'logged_in' not in st.session_state:
         st.session_state.logged_in = False
@@ -32,27 +40,48 @@ def app():
             st.session_state.logged_in = False
             time.sleep(2)
             st.experimental_rerun()
-        #The user is logged in
+        # The user is logged in
         st.title(f"{character['name']}")
+        st.divider()
         tab1, tab2, tab3 = st.tabs(["Character Stats", "Items", "Key Notes"])
         with tab1:
             c1, c2, c3 = st.columns(3)
             with c1:
+                c4, c5, c6, c7 = st.columns([5,2,1,1])
                 st.write('Physis')
-                st.text(f"Körperkraft: {character['kk']}")
-                st.text(f"Ausdauer: {character['a']}")
-                st.text(f"Präzision {character['a']}")
-                st.text(f"Physische Belbarkeitast {character['pb']}")
-                st.text(f"Verhindern {character['v']}")
+                with c4:
+
+                    st.text(f"Körperkraft:")
+                    st.text(f"Ausdauer:                 {character['a']}")
+                    st.text(f"Präzision                 {character['a']}")
+                    st.text(f"Physische Belbarkeitast   {character['pb']}")
+                    st.text(f"Verhindern                {character['v']}")
+                with c5:
+
+                    st.markdown('<p class="big-font">0</p>', unsafe_allow_html=True)
+                    # st.write(character['kk'])
+                with c6:
+                    st.button(label="+1", key=0)
+                    st.button(label="+1", key=1)
+                    st.button(label="+1", key=2)
+                    st.button(label="+1", key=3)
+                    st.button(label="+1", key=4)
+
+                with c7:
+                    st.button(label="-1", key=5)
+                    st.button(label="-1", key=6)
+                    st.button(label="-1", key=7)
+                    st.button(label="-1", key=8)
+                    st.button(label="-1", key=9)
             with c2:
-                st.text('Psyche')
+                st.write('Psyche')
                 st.text(f"Intelligenz: {character['intel']}")
                 st.text(f"Willenskraft: {character['wk']}")
                 st.text(f"Wahrnehmung {character['wa']}")
                 st.text(f"Mentale Belastbarkeit {character['mb']}")
                 st.text(f"Inspiration {character['ins']}")
             with c3:
-                st.text('Talente')
+                st.write('Talente')
                 st.text(f"Initiative: {character['ini']}")
                 st.text(f"Technisches Verständnis: {character['tv']}")
                 st.text(f"Glück {character['g']}")
@@ -61,28 +90,6 @@ def app():
 
         with tab2:
             create_item_elements_for_character_id(character["id"])
-            # with elements("dashboard"):
-            #     # You can create a draggable and resizable dashboard using
-            #     # any element available in Streamlit Elements.
-            #
-            #     from streamlit_elements import dashboard
-            #
-            #     # First, build a default layout for every element you want to include in your dashboard
-            #
-            #     layout = [
-            #         # Parameters: element_identifier, x_pos, y_pos, width, height, [item properties...]
-            #         dashboard.Item("first_item", 0, 0, 2, 2),
-            #         dashboard.Item("second_item", 2, 0, 2, 2, isDraggable=True),
-            #         dashboard.Item("third_item", 0, 2, 1, 1, isResizable=True),
-            #     ]
-            #
-            #     # Next, create a dashboard layout using the 'with' syntax. It takes the layout
-            #     # as first parameter, plus additional properties you can find in the GitHub links below.
-            #
-            #     with dashboard.Grid(layout):
-            #         mui.Paper("First item", key="first_item")
-            #         mui.Paper("Second item (cannot drag)", key="second_item")
-            #         mui.Paper("Third item (cannot resize)", key="third_item")
             st.divider()
             item_names = get_values_alchemy(table_name='items', column_name='name')
             item_to_add = st.selectbox('Add Item', item_names)
@@ -92,8 +99,6 @@ def app():
                 time.sleep(1)
                 st.experimental_rerun()
 
-
-
         with tab3:
             st.header("An owl")
             st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
@@ -101,6 +106,7 @@ def app():
         if st.button('Log Out'):
             st.session_state.logged_in = False
             st.experimental_rerun()
+
 
 if __name__ == "__main__":
     app()
