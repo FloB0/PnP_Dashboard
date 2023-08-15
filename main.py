@@ -3,13 +3,13 @@ import streamlit
 from util import *
 from streamlit_elements import elements, mui, html
 
-def app():
-    st.set_page_config(
+st.set_page_config(
         page_title="DarkDystopia",
         page_icon="🧊",
         layout="wide",
         initial_sidebar_state="collapsed"
-    )
+)
+def app():
     if 'logged_in' not in st.session_state:
         st.session_state.logged_in = False
 

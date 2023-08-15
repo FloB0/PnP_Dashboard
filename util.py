@@ -72,7 +72,7 @@ def get_values_alchemy(table_name: object, column_name: object) -> object:
         result = connection.execute(sql)
         values = [row[0] for row in result.fetchall()]
 
-    print(values)
+    # print(values)
     return values
 
 
@@ -764,6 +764,7 @@ def get_layout_character_item(character_id):
     layout_x = 0
     layout_y = 0
     for key in items_from_character:
+        print("X: ", layout_x, " Y: ", layout_y)
         quantity_iterator = 0
         while quantity_iterator < items_from_character[key]:
             dashboard_item = dashboard.Item(str(layout_iterator), layout_x, layout_y, 3, 4)
@@ -775,8 +776,8 @@ def get_layout_character_item(character_id):
             else:
                 layout_y += 4
                 layout_x = 0
-        print("print ",key)
-    print(items_from_character)
+        # print("print ",key)
+    # print(items_from_character)
     return layout
 
 
@@ -784,15 +785,18 @@ def create_item_elements_for_character_id(characterID):
     layout = get_layout_character_item(characterID)
     print(layout)
     items = get_items_for_character(characterID)
+    item_counter = 0
     with elements("Dashboard Items"):
         with dashboard.Grid(layout, draggableHandle=".draggable"):
             for key in items:
                 quantity_iterator = 0
                 while quantity_iterator < items[key]:
-
+                    print('layout:', layout[item_counter]['i'])
                     item_list = get_item_from_id(key)
-                    print(item_list)
-                    with mui.Card(key=quantity_iterator, sx={"display": "flex", "flexDirection": "column"}):
+                    # print(item_list)
+                    with mui.Card(key=str(item_counter), sx={"display": "flex", "flexDirection": "column"}):
+                        quantity_iterator += 1
+                        item_counter += 1
                         mui.CardHeader(
                             title=item_list[0][0],
                             action=mui.IconButton(mui.icon.DeleteOutline),
@@ -807,7 +811,9 @@ def create_item_elements_for_character_id(characterID):
                         with mui.CardContent(sx={"flex": 1}):
                             mui.Typography(item_list[0][2])
 
-                        quantity_iterator += 1
+
+
 
 
 create_item_elements_for_character_id(24)
+print(get_items_for_character(24))
