@@ -574,6 +574,7 @@ def delete_character_alchemy(name):
 
     # Optionally, you can check the number of deleted rows:
     print(f"Deleted {result.rowcount} rows.")
+    del st.session_state['active_char']
 
 
 def delete_data_alchemy(table_name, name):
@@ -813,6 +814,16 @@ def create_item_elements_for_character_id(characterID):
                             mui.Typography(item_list[0][2])
 
 
+def increment_stat(stat):
+    # Get the current value of the specified attribute from st.session_state
+    st.session_state.active_char[stat] = st.session_state.active_char[stat] + 1
+    print("incremented")
+
+
+def decrement_stat(stat):
+    # Get the current value of the specified attribute from st.session_state
+    st.session_state.active_char[stat] = st.session_state.active_char[stat] - 1
+    print("decremented")
 
 
 
