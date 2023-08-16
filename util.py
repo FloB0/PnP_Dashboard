@@ -426,50 +426,98 @@ def update_secondary(id):
     update_character('secondary_info', id, updated_values)
 
 
-def update_secondary_alchemy(id):
-    character = get_character_by_id_alchemy(id)
-    nahkampf = character['kk'] * 2 + character['p'] + character['nahkampf']
-    fernkampf = character['p'] + character['wa'] + character['mb'] + character['fernkampf']
-    parieren = character['kk'] + character['v'] + character['a'] + character['parieren']
-    entweichen = character['v'] * 2 + character['g'] + character['entweichen']
-    zähigkeit = character['a'] * 2 + character['pb'] + character['zähigkeit']
-    ausweichen = character['v'] + character['wa'] + character['g'] + character['ausweichen']
-    tarnung = character['pb'] + character['g'] + character['mb'] + character['tarnung']
-    fingerfertigkeit = character['p'] + character['mb'] + character['tv'] + character['fingerfertigkeit']
-    schnelligkeit = character['p'] + character['ini'] * 2 + character['schnelligkeit']
-    nachsetzen = character['v'] + character['wk'] + character['ini'] + character['nachsetzen']
-    luegen = character['mb'] + character['c'] * 2 + character['luegen']
-    etikette = character['ins'] + character['wi'] + character['c'] + character['etikette']
-    handeln = character['intel'] * 2 + character['g'] + character['handeln']
-    ueberzeugen = character['wk'] * 2 + character['ins'] + character['ueberzeugen']
-    einschuechtern = character['kk'] + character['a'] + character['c'] + character['einschuechtern']
-    mechanik = character['tv'] * 2 + character['wi'] + character['mechanik']
-    aetherkunde = character['mb'] + character['intel'] + character['wi'] + character['aetherkunde']
-    xenos = character['intel'] + character['wi'] * 2 + character['xenos']
-    handwerk = character['p'] + character['tv'] * 2 + character['handwerk']
-    steuerung = character['pb'] + character['tv'] + character['wi'] + character['steuerung']
-    updated_values = {
-        'nahkampf': nahkampf,
-        'fernkampf': fernkampf,
-        'parieren': parieren,
-        'entweichen': entweichen,
-        'zähigkeit': zähigkeit,
-        'ausweichen': ausweichen,
-        'tarnung': tarnung,
-        'fingerfertigkeit': fingerfertigkeit,
-        'schnelligkeit': schnelligkeit,
-        'nachsetzen': nachsetzen,
-        'luegen': luegen,
-        'etikette': etikette,
-        'handeln': handeln,
-        'ueberzeugen': ueberzeugen,
-        'einschuechtern': einschuechtern,
-        'mechanik': mechanik,
-        'aetherkunde': aetherkunde,
-        'xenos': xenos,
-        'handwerk': handwerk,
-        'steuerung': steuerung
-    }
+def update_secondary_alchemy(id, by_session_state):
+    if not by_session_state:
+        character = get_character_by_id_alchemy(id)
+        nahkampf = character['kk'] * 2 + character['p'] + character['nahkampf']
+        fernkampf = character['p'] + character['wa'] + character['mb'] + character['fernkampf']
+        parieren = character['kk'] + character['v'] + character['a'] + character['parieren']
+        entweichen = character['v'] * 2 + character['g'] + character['entweichen']
+        zähigkeit = character['a'] * 2 + character['pb'] + character['zähigkeit']
+        ausweichen = character['v'] + character['wa'] + character['g'] + character['ausweichen']
+        tarnung = character['pb'] + character['g'] + character['mb'] + character['tarnung']
+        fingerfertigkeit = character['p'] + character['mb'] + character['tv'] + character['fingerfertigkeit']
+        schnelligkeit = character['p'] + character['ini'] * 2 + character['schnelligkeit']
+        nachsetzen = character['v'] + character['wk'] + character['ini'] + character['nachsetzen']
+        luegen = character['mb'] + character['c'] * 2 + character['luegen']
+        etikette = character['ins'] + character['wi'] + character['c'] + character['etikette']
+        handeln = character['intel'] * 2 + character['g'] + character['handeln']
+        ueberzeugen = character['wk'] * 2 + character['ins'] + character['ueberzeugen']
+        einschuechtern = character['kk'] + character['a'] + character['c'] + character['einschuechtern']
+        mechanik = character['tv'] * 2 + character['wi'] + character['mechanik']
+        aetherkunde = character['mb'] + character['intel'] + character['wi'] + character['aetherkunde']
+        xenos = character['intel'] + character['wi'] * 2 + character['xenos']
+        handwerk = character['p'] + character['tv'] * 2 + character['handwerk']
+        steuerung = character['pb'] + character['tv'] + character['wi'] + character['steuerung']
+        updated_values = {
+            'nahkampf': nahkampf,
+            'fernkampf': fernkampf,
+            'parieren': parieren,
+            'entweichen': entweichen,
+            'zähigkeit': zähigkeit,
+            'ausweichen': ausweichen,
+            'tarnung': tarnung,
+            'fingerfertigkeit': fingerfertigkeit,
+            'schnelligkeit': schnelligkeit,
+            'nachsetzen': nachsetzen,
+            'luegen': luegen,
+            'etikette': etikette,
+            'handeln': handeln,
+            'ueberzeugen': ueberzeugen,
+            'einschuechtern': einschuechtern,
+            'mechanik': mechanik,
+            'aetherkunde': aetherkunde,
+            'xenos': xenos,
+            'handwerk': handwerk,
+            'steuerung': steuerung
+        }
+        print(updated_values)
+    else:
+        nahkampf = st.session_state.character['kk'] * 2 + st.session_state.character['p'] + st.session_state.character['nahkampf']
+        fernkampf = st.session_state.character['p'] + st.session_state.character['wa'] + st.session_state.character['mb'] + st.session_state.character['fernkampf']
+        parieren = st.session_state.character['kk'] + st.session_state.character['v'] + st.session_state.character['a'] + st.session_state.character['parieren']
+        entweichen = st.session_state.character['v'] * 2 + st.session_state.character['g'] + st.session_state.character['entweichen']
+        zähigkeit = st.session_state.character['a'] * 2 + st.session_state.character['pb'] + st.session_state.character['zähigkeit']
+        ausweichen = st.session_state.character['v'] + st.session_state.character['wa'] + st.session_state.character['g'] + st.session_state.character['ausweichen']
+        tarnung = st.session_state.character['pb'] + st.session_state.character['g'] + st.session_state.character['mb'] + st.session_state.character['tarnung']
+        fingerfertigkeit = st.session_state.character['p'] + st.session_state.character['mb'] + st.session_state.character['tv'] + st.session_state.character['fingerfertigkeit']
+        schnelligkeit = st.session_state.character['p'] + st.session_state.character['ini'] * 2 + st.session_state.character['schnelligkeit']
+        nachsetzen = st.session_state.character['v'] + st.session_state.character['wk'] + st.session_state.character['ini'] + st.session_state.character['nachsetzen']
+        luegen = st.session_state.character['mb'] + st.session_state.character['c'] * 2 + st.session_state.character['luegen']
+        etikette = st.session_state.character['ins'] + st.session_state.character['wi'] + st.session_state.character['c'] + st.session_state.character['etikette']
+        handeln = st.session_state.character['intel'] * 2 + st.session_state.character['g'] + st.session_state.character['handeln']
+        ueberzeugen = st.session_state.character['wk'] * 2 + st.session_state.character['ins'] + st.session_state.character['ueberzeugen']
+        einschuechtern = st.session_state.character['kk'] + st.session_state.character['a'] + st.session_state.character['c'] + st.session_state.character['einschuechtern']
+        mechanik = st.session_state.character['tv'] * 2 + st.session_state.character['wi'] + st.session_state.character['mechanik']
+        aetherkunde = st.session_state.character['mb'] + st.session_state.character['intel'] + st.session_state.character['wi'] + st.session_state.character['aetherkunde']
+        xenos = st.session_state.character['intel'] + st.session_state.character['wi'] * 2 + st.session_state.character['xenos']
+        handwerk = st.session_state.character['p'] + st.session_state.character['tv'] * 2 + st.session_state.character['handwerk']
+        steuerung = st.session_state.character['pb'] + st.session_state.character['tv'] + st.session_state.character['wi'] + st.session_state.character['steuerung']
+        updated_values = {
+            'nahkampf': nahkampf,
+            'fernkampf': fernkampf,
+            'parieren': parieren,
+            'entweichen': entweichen,
+            'zähigkeit': zähigkeit,
+            'ausweichen': ausweichen,
+            'tarnung': tarnung,
+            'fingerfertigkeit': fingerfertigkeit,
+            'schnelligkeit': schnelligkeit,
+            'nachsetzen': nachsetzen,
+            'luegen': luegen,
+            'etikette': etikette,
+            'handeln': handeln,
+            'ueberzeugen': ueberzeugen,
+            'einschuechtern': einschuechtern,
+            'mechanik': mechanik,
+            'aetherkunde': aetherkunde,
+            'xenos': xenos,
+            'handwerk': handwerk,
+            'steuerung': steuerung
+        }
+        print(updated_values)
+
+    #here this will end in a endless loop -> variables need in a new table
     update_character_alchemy('secondary_info', id, updated_values)
 
 
