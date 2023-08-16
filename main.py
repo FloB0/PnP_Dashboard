@@ -141,6 +141,30 @@ def app():
                 c11.button(label="+1", key=128, on_click=increment_stat, args=('c',))
                 c12.button(label="-1", key=129, on_click=decrement_stat, args=('c',))
 
+            st.divider()
+            st.subheader("Secondary Abilities")
+            c21, c22, c23, c24, c25, c26, c27, c28, c29, c210, c211, c212, c213, c214, c215, c216= st.columns([5, 2, 1, 1, 5, 2, 1, 1, 5, 2, 1, 1, 5, 2, 1, 1])
+            with st.container():
+                c21.markdown(f'<p class="big-font">Verhindern</p>', unsafe_allow_html=True)
+                c22.markdown('<p class="big-font">{}</p>'.format(st.session_state['active_char']['v']),
+                            unsafe_allow_html=True)
+                c23.button(label="+1", key=124, on_click=increment_stat, args=('v',))
+                c24.button(label="-1", key=125, on_click=decrement_stat, args=('v',))
+                c25.markdown(f'<p class="big-font">Inspiration</p>', unsafe_allow_html=True)
+                c26.markdown('<p class="big-font">{}</p>'.format(st.session_state['active_char']['ins']),
+                            unsafe_allow_html=True)
+                c27.button(label="+1", key=126, on_click=increment_stat, args=('ins',))
+                c28.button(label="-1", key=127, on_click=decrement_stat, args=('ins',))
+                c29.markdown(f'<p class="big-font">Charisma</p>', unsafe_allow_html=True)
+                c210.markdown('<p class="big-font">{}</p>'.format(st.session_state['active_char']['c']),
+                             unsafe_allow_html=True)
+                c211.button(label="+1", key=128, on_click=increment_stat, args=('c',))
+                c212.button(label="-1", key=129, on_click=decrement_stat, args=('c',))
+                c213.markdown(f'<p class="big-font">Charisma</p>', unsafe_allow_html=True)
+                c214.markdown('<p class="big-font">{}</p>'.format(st.session_state['active_char']['c']),
+                              unsafe_allow_html=True)
+                c215.button(label="+1", key=128, on_click=increment_stat, args=('c',))
+                c216.button(label="-1", key=129, on_click=decrement_stat, args=('c',))
         with tab2:
             create_item_elements_for_character_id(st.session_state.active_char["id"])
             st.divider()
