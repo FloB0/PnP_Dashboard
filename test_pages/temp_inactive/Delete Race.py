@@ -2,11 +2,11 @@ from util import *
 import time
 
 st.set_page_config(
-        page_title="DarkDystopia",
-        page_icon="🧊",
-        layout="centered",
-        initial_sidebar_state="expanded"
-    )
+    page_title="DarkDystopia",
+    page_icon="🧊",
+    layout="centered",
+    initial_sidebar_state="expanded"
+)
 st.title("Delete Race")
 names_from_primary_info = get_values_alchemy('race', 'name')
 st.session_state.delete = st.selectbox("Select race to delete", names_from_primary_info)

@@ -7,7 +7,7 @@ st.set_page_config(
         layout="centered",
         initial_sidebar_state="expanded"
     )
-st.title("Delete Class")
+st.title("Delete Item")
 names_from_primary_info = get_values_alchemy('items', 'name')
 st.session_state.delete = st.selectbox("Select item to delete", names_from_primary_info)
 if st.button('Delete item'):
