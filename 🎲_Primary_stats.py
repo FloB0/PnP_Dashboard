@@ -272,6 +272,11 @@ def app():
         # with tab3:
         #     st.header("An owl")
         #     st.image("https://static.streamlit.io/examples/owl.jpg", width=200)
+        if st.session_state.active_char == character:
+            if st.button("Update"):
+                print("update")
+
+
 
         if st.button('Log Out'):
             st.session_state.logged_in = False
