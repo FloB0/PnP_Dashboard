@@ -156,14 +156,20 @@ def app():
 
 
             # st.markdown(f'<p class="bottom_text">Some text</p>', unsafe_allow_html=True)
-            if st.session_state.active_char == get_character_by_name_alchemy(st.session_state.key):
-                if st.button("Update"):
-                    print("update")
+    st.divider()
+    c41, c42, c43 = st.columns([12,12,1.5])
+    with c41:
         if st.button('Log Out'):
             st.session_state.logged_in = False
             st.session_state.char_fetched = False
             del st.session_state['active_char']
             st.experimental_rerun()
+    with c43:
+        if 'active_char' in st.session_state:
+            if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
+                st.session_state.updated_button_visible = True
+                if st.button("Update"):
+                    print("3")
 
 
 if __name__ == "__main__":
