@@ -222,26 +222,46 @@ def update_secondary_alchemy(id, by_session_state):
         }
         print(updated_values)
     else:
-        nahkampf = st.session_state.character['kk'] * 2 + st.session_state.character['p'] + st.session_state.character['nahkampf']
-        fernkampf = st.session_state.character['p'] + st.session_state.character['wa'] + st.session_state.character['mb'] + st.session_state.character['fernkampf']
-        parieren = st.session_state.character['kk'] + st.session_state.character['v'] + st.session_state.character['a'] + st.session_state.character['parieren']
-        entweichen = st.session_state.character['v'] * 2 + st.session_state.character['g'] + st.session_state.character['entweichen']
-        zähigkeit = st.session_state.character['a'] * 2 + st.session_state.character['pb'] + st.session_state.character['zähigkeit']
-        ausweichen = st.session_state.character['v'] + st.session_state.character['wa'] + st.session_state.character['g'] + st.session_state.character['ausweichen']
-        tarnung = st.session_state.character['pb'] + st.session_state.character['g'] + st.session_state.character['mb'] + st.session_state.character['tarnung']
-        fingerfertigkeit = st.session_state.character['p'] + st.session_state.character['mb'] + st.session_state.character['tv'] + st.session_state.character['fingerfertigkeit']
-        schnelligkeit = st.session_state.character['p'] + st.session_state.character['ini'] * 2 + st.session_state.character['schnelligkeit']
-        nachsetzen = st.session_state.character['v'] + st.session_state.character['wk'] + st.session_state.character['ini'] + st.session_state.character['nachsetzen']
-        luegen = st.session_state.character['mb'] + st.session_state.character['c'] * 2 + st.session_state.character['luegen']
-        etikette = st.session_state.character['ins'] + st.session_state.character['wi'] + st.session_state.character['c'] + st.session_state.character['etikette']
-        handeln = st.session_state.character['intel'] * 2 + st.session_state.character['g'] + st.session_state.character['handeln']
-        ueberzeugen = st.session_state.character['wk'] * 2 + st.session_state.character['ins'] + st.session_state.character['ueberzeugen']
-        einschuechtern = st.session_state.character['kk'] + st.session_state.character['a'] + st.session_state.character['c'] + st.session_state.character['einschuechtern']
-        mechanik = st.session_state.character['tv'] * 2 + st.session_state.character['wi'] + st.session_state.character['mechanik']
-        aetherkunde = st.session_state.character['mb'] + st.session_state.character['intel'] + st.session_state.character['wi'] + st.session_state.character['aetherkunde']
-        xenos = st.session_state.character['intel'] + st.session_state.character['wi'] * 2 + st.session_state.character['xenos']
-        handwerk = st.session_state.character['p'] + st.session_state.character['tv'] * 2 + st.session_state.character['handwerk']
-        steuerung = st.session_state.character['pb'] + st.session_state.character['tv'] + st.session_state.character['wi'] + st.session_state.character['steuerung']
+        nahkampf = st.session_state.character['kk'] * 2 + st.session_state.character['p'] + st.session_state.character[
+            'nahkampf']
+        fernkampf = st.session_state.character['p'] + st.session_state.character['wa'] + st.session_state.character[
+            'mb'] + st.session_state.character['fernkampf']
+        parieren = st.session_state.character['kk'] + st.session_state.character['v'] + st.session_state.character[
+            'a'] + st.session_state.character['parieren']
+        entweichen = st.session_state.character['v'] * 2 + st.session_state.character['g'] + st.session_state.character[
+            'entweichen']
+        zähigkeit = st.session_state.character['a'] * 2 + st.session_state.character['pb'] + st.session_state.character[
+            'zähigkeit']
+        ausweichen = st.session_state.character['v'] + st.session_state.character['wa'] + st.session_state.character[
+            'g'] + st.session_state.character['ausweichen']
+        tarnung = st.session_state.character['pb'] + st.session_state.character['g'] + st.session_state.character[
+            'mb'] + st.session_state.character['tarnung']
+        fingerfertigkeit = st.session_state.character['p'] + st.session_state.character['mb'] + \
+                           st.session_state.character['tv'] + st.session_state.character['fingerfertigkeit']
+        schnelligkeit = st.session_state.character['p'] + st.session_state.character['ini'] * 2 + \
+                        st.session_state.character['schnelligkeit']
+        nachsetzen = st.session_state.character['v'] + st.session_state.character['wk'] + st.session_state.character[
+            'ini'] + st.session_state.character['nachsetzen']
+        luegen = st.session_state.character['mb'] + st.session_state.character['c'] * 2 + st.session_state.character[
+            'luegen']
+        etikette = st.session_state.character['ins'] + st.session_state.character['wi'] + st.session_state.character[
+            'c'] + st.session_state.character['etikette']
+        handeln = st.session_state.character['intel'] * 2 + st.session_state.character['g'] + \
+                  st.session_state.character['handeln']
+        ueberzeugen = st.session_state.character['wk'] * 2 + st.session_state.character['ins'] + \
+                      st.session_state.character['ueberzeugen']
+        einschuechtern = st.session_state.character['kk'] + st.session_state.character['a'] + \
+                         st.session_state.character['c'] + st.session_state.character['einschuechtern']
+        mechanik = st.session_state.character['tv'] * 2 + st.session_state.character['wi'] + st.session_state.character[
+            'mechanik']
+        aetherkunde = st.session_state.character['mb'] + st.session_state.character['intel'] + \
+                      st.session_state.character['wi'] + st.session_state.character['aetherkunde']
+        xenos = st.session_state.character['intel'] + st.session_state.character['wi'] * 2 + st.session_state.character[
+            'xenos']
+        handwerk = st.session_state.character['p'] + st.session_state.character['tv'] * 2 + st.session_state.character[
+            'handwerk']
+        steuerung = st.session_state.character['pb'] + st.session_state.character['tv'] + st.session_state.character[
+            'wi'] + st.session_state.character['steuerung']
         updated_values = {
             'nahkampf': nahkampf,
             'fernkampf': fernkampf,
@@ -266,7 +286,7 @@ def update_secondary_alchemy(id, by_session_state):
         }
         print(updated_values)
 
-    #here this will end in a endless loop -> variables need in a new table
+    # here this will end in a endless loop -> variables need in a new table
     update_character_alchemy('secondary_info', id, updated_values)
 
 
@@ -424,7 +444,6 @@ def delete_item_from_character(character_id, item_name):
     decrement_or_delete_character_item(data)
 
 
-
 def get_items_for_character(characterID):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -435,7 +454,6 @@ def get_items_for_character(characterID):
 
     # Create the select statement to get all itemID and quantity for the specified characterID
     stmt = select(table.c.itemID, table.c.quantity).where(table.c.characterID == characterID)
-
 
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
@@ -460,7 +478,6 @@ def get_item_from_id(itemID):
 
     # Create the select statement to get all itemID and quantity for the specified characterID
     stmt = select(table.c.name, table.c.image_url, table.c.description).where(table.c.id == itemID)
-
 
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
@@ -534,10 +551,10 @@ def create_item_elements_for_character_id(characterID):
 def increment_stat(stat):
     # Get the current value of the specified attribute from st.session_state
     st.session_state.active_char[stat] = st.session_state.active_char[stat] + 1
-    print("incremented")
+    return
 
 
 def decrement_stat(stat):
     # Get the current value of the specified attribute from st.session_state
     st.session_state.active_char[stat] = st.session_state.active_char[stat] - 1
-    print("decremented")
+    return

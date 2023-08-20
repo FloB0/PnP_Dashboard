@@ -37,6 +37,7 @@ def app():
         st.session_state.key = st.selectbox("Select your character", names_from_primary_info)
         if st.button('Log in'):
             character = get_character_by_name_alchemy(st.session_state.key)
+            st.session_state.active_char = character
             # If a character was found, display their information
             if character is not None:
                 st.session_state.logged_in = True
@@ -51,6 +52,7 @@ def app():
             character = get_character_by_name_alchemy(st.session_state.key)
             st.session_state.active_char = character
             st.session_state.char_fetched = True
+            st.experimental_rerun()
         else:
             if 'active_char' not in st.session_state:
                 st.toast("Character is not valid anymore", icon="🚨")
@@ -61,11 +63,8 @@ def app():
             # The user is logged in
             st.title(f"Primary Abilities - {st.session_state['active_char']['name']}")
             st.divider()
-            # tab1, tab2, tab3 = st.tabs(["Character Stats", "Items", "Key Notes"])
-            # with tab1:
             c100, c110, c120 = st.columns(3)
             c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12 = st.columns([5, 2, 1, 1, 5, 2, 1, 1, 5, 2, 1, 1])
-
             with st.container():
                 c100.markdown(f'<p class="big-font">Physis</p>', unsafe_allow_html=True)
                 c110.markdown(f'<p class="big-font">Psyche</p>', unsafe_allow_html=True)
@@ -150,26 +149,26 @@ def app():
                              unsafe_allow_html=True)
                 c11.button(label="+1", key=128, on_click=increment_stat, args=('c',))
                 c12.button(label="-1", key=129, on_click=decrement_stat, args=('c',))
-
-
-
-
-
             # st.markdown(f'<p class="bottom_text">Some text</p>', unsafe_allow_html=True)
-    st.divider()
-    c41, c42, c43 = st.columns([12,12,1.5])
-    with c41:
+        st.divider()
+        # c41, c42, c43 = st.columns([20, 1.5, 1.5])
+
+        # with c42:
+        if 'active_char' in st.session_state:
+            if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
+                if st.button("Reset", type= "primary"):
+                    print("3")
+        # with c43:
+        if 'active_char' in st.session_state:
+            if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
+                if st.button("Update", type= "primary"):
+                    print("3")
+        # with c41:
         if st.button('Log Out'):
             st.session_state.logged_in = False
             st.session_state.char_fetched = False
             del st.session_state['active_char']
             st.experimental_rerun()
-    with c43:
-        if 'active_char' in st.session_state:
-            if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
-                st.session_state.updated_button_visible = True
-                if st.button("Update"):
-                    print("3")
 
 
 if __name__ == "__main__":
