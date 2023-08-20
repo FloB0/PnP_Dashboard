@@ -294,6 +294,10 @@ def on_submit_click():
     st.session_state.submitted = True
 
 
+def on_note_submit_click():
+    st.session_state.note_submitted = True
+
+
 def delete_character_alchemy(name):
     engine = init_connection_alchemy()
     metadata = MetaData()
