@@ -23,7 +23,8 @@ styl = f"""
 """
 st.markdown(styl, unsafe_allow_html=True)
 
-from util import (get_values_alchemy, get_character_by_name_alchemy, increment_stat, decrement_stat)
+from util import (get_values_alchemy, get_character_by_name_alchemy, increment_stat, decrement_stat,
+                  update_character_alchemy)
 import time
 
 
@@ -163,7 +164,9 @@ def app():
         if 'active_char' in st.session_state:
             if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
                 if st.button("Update", type="primary"):
-                    print("3")
+                    update_character_alchemy('primary_info', st.session_state['active_char']['id'],
+                                             st.session_state['active_char'])
+                    st.experimental_rerun()
         # with c41:
         if st.button('Log Out'):
             st.session_state.logged_in = False

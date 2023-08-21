@@ -3,6 +3,7 @@ import sqlite3 as sql3
 import mysql.connector
 from sqlalchemy import create_engine, text, MetaData, Table, select, insert, update, delete
 from streamlit_elements import elements, dashboard, mui, editor, media, lazy, sync, nivo
+from sqlalchemy.exc import SQLAlchemyError
 
 import time
 from streamlit import session_state as ss
@@ -173,6 +174,44 @@ def update_character_alchemy(table_name, character_id, updated_values):
             # If record exists, update it
             upd_stmt = update(table).where(table.c.id.eq(character_id)).values(updated_values)
             connection.execute(upd_stmt)
+
+
+def update_character_alchemy_updated(table_name, character_id, updated_values):
+    session = init_connection_alchemy()
+    metadata = MetaData()
+
+    try:
+        if not session.bind.dialect.has_table(session.bind, table_name):
+            print(f"Table {table_name} does not exist.")
+            return False
+
+        table = Table(table_name, metadata, autoload_with=session.bind)
+
+        existing_columns = set(column.name for column in list(table.columns))
+        for column_name in updated_values.keys():
+            if column_name not in existing_columns:
+                print(f"Column {column_name} does not exist in table {table_name}.")
+                return False
+
+        record = session.query(table).filter(table.c.id == character_id).first()
+
+        if record is None:
+            # Insert new record
+            ins_stmt = insert(table).values(id=character_id, **updated_values)
+            session.execute(ins_stmt)
+        else:
+            # Update existing record
+            upd_stmt = update(table).where(table.c.id == character_id).values(updated_values)
+            session.execute(upd_stmt)
+
+        session.commit()
+        return True
+    except SQLAlchemyError as e:
+        print(f"Database error: {e}")
+        session.rollback()
+        return False
+    finally:
+        session.close()
 
 
 def update_secondary_alchemy(id, by_session_state):
