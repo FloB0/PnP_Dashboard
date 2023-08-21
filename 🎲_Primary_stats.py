@@ -156,12 +156,13 @@ def app():
         # with c42:
         if 'active_char' in st.session_state:
             if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
-                if st.button("Reset", type= "primary"):
-                    print("3")
+                if st.button("Reset", type="primary"):
+                    st.session_state["active_char"] = get_character_by_name_alchemy(st.session_state.key)
+                    st.experimental_rerun()
         # with c43:
         if 'active_char' in st.session_state:
             if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
-                if st.button("Update", type= "primary"):
+                if st.button("Update", type="primary"):
                     print("3")
         # with c41:
         if st.button('Log Out'):
