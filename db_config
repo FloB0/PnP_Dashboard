@@ -1,0 +1,35 @@
+import os
+from azure.keyvault.secrets import SecretClient
+from azure.identity import DefaultAzureCredential
+from azure.core.pipeline.policies import ProxyPolicy
+import requests
+import random
+
+def main():
+    proxy_server = ['http://svc_web_crawling:eTW6C&EoZJWbj3tk@srvardmz0003.dmz.lindner.lan:8084',
+                    'http://svc_web_crawling:eTW6C&EoZJWbj3tk@srvardmz0008.dmz.lindner.lan:8084']
+    proxy = random.choice(proxy_server)
+    proxies = {
+        "http": proxy,
+        "https": proxy,
+        "ftp": proxy
+    }
+    transport = requests.Session()
+    transport.proxies = proxies
+
+
+    keyVaultName = "FlosKeys"
+    kv_uri = f"https://floskeys.vault.azure.net/"
+
+    client = SecretClient(
+        vault_url=kv_uri,
+        credential=DefaultAzureCredential(),
+        transport=None,  # This is default, meaning it will use the Requests-based transport
+        policies=[ProxyPolicy(proxies=proxies)]
+    )
+
+    retrieved_secret = client.get_secret('USERNAME')
+    print(f"Your secret is '{retrieved_secret.value}'.")
+
+if __name__ == '__main__':
+    main()
