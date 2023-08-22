@@ -164,7 +164,7 @@ def app():
         if 'active_char' in st.session_state:
             if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
                 if st.button("Update", type="primary"):
-                    update_character_alchemy_updated('primary_info', st.session_state['active_char']['id'],
+                    update_character_alchemy_updated('primary_info', st.session_state.key,
                                                      st.session_state['active_char'])
                     st.experimental_rerun()
         # with c41:
