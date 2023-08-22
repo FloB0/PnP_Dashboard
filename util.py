@@ -179,6 +179,49 @@ def update_character_alchemy(table_name, character_id, updated_values):
 def update_character_alchemy_updated(table_name, character_id, updated_values):
     engine = init_connection_alchemy()
     metadata = MetaData()
+    updated_values.pop('id', None)
+    # Use inspect to check if table exists
+    inspector = inspect(engine)
+    if not inspector.has_table(table_name):
+        print(f"Table {table_name} does not exist.")
+        return False
+
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    existing_columns = set(column.name for column in list(table.columns))
+    for column_name in updated_values.keys():
+        if column_name not in existing_columns:
+            print(f"Column {column_name} does not exist in table {table_name}.")
+            return False
+
+    try:
+        with engine.connect() as connection:
+            record = connection.execute(select(table.columns).where(table.c.id == character_id)).fetchone()
+
+            if record:
+                # Update existing record
+                # Exclude fields you don't want to update
+                fields_to_exclude = {'id', 'name', 'race', 'class'}
+                update_values = {k: v for k, v in updated_values.items() if k not in fields_to_exclude}
+
+                upd_stmt = update(table).where(table.c.id == character_id).values(update_values)
+                connection.execute(upd_stmt)
+                connection.commit()
+                return True
+            else:
+                print(f"Record with id {character_id} not found. No update performed.")
+                return False
+
+            connection.commit()
+            return True
+    except SQLAlchemyError as e:
+        print(f"Database error: {e}")
+        return False
+
+
+def update_character_by_name(table_name, character_name, updated_values):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
 
     # Use inspect to check if table exists
     inspector = inspect(engine)
@@ -196,23 +239,25 @@ def update_character_alchemy_updated(table_name, character_id, updated_values):
 
     try:
         with engine.connect() as connection:
-            record = connection.execute(select([table]).where(table.c.id == character_id)).fetchone()
+            # Check if a record with the given name exists
+            record = connection.execute(select(table.columns).where(table.c.name == character_name)).fetchone()
 
-            if record is None:
-                # Insert new record
-                ins_stmt = insert(table).values(id=character_id, **updated_values)
-                connection.execute(ins_stmt)
-            else:
-                # Update existing record
-                upd_stmt = update(table).where(table.c.id == character_id).values(updated_values)
+            if record:
+                # Exclude fields you don't want to update
+                fields_to_exclude = {'id', 'name', 'race', 'class'}
+                update_values = {k: v for k, v in updated_values.items() if k not in fields_to_exclude}
+
+                # Update the record based on the name
+                upd_stmt = update(table).where(table.c.name == character_name).values(update_values)
                 connection.execute(upd_stmt)
-
-            connection.commit()
-            return True
+                connection.commit()
+                return True
+            else:
+                print(f"Record with name {character_name} not found. No update performed.")
+                return False
     except SQLAlchemyError as e:
         print(f"Database error: {e}")
         return False
-
 
 def update_secondary_alchemy(id, by_session_state):
     if not by_session_state:
