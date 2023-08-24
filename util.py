@@ -646,3 +646,23 @@ def decrement_stat(stat):
     # Get the current value of the specified attribute from st.session_state
     st.session_state.active_char[stat] = st.session_state.active_char[stat] - 1
     return
+
+
+def stat_adaption(input_value):
+    output_value = 0
+
+    while input_value > 0:
+        if output_value < 10:
+            decrement = 1
+        elif output_value < 15:
+            decrement = 2
+        else:
+            decrement = 3
+
+        input_value -= decrement
+        if input_value >= 0:
+            output_value += 1
+        else:
+            break
+
+    return output_value
