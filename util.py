@@ -259,6 +259,7 @@ def update_character_by_name(table_name, character_name, updated_values):
         print(f"Database error: {e}")
         return False
 
+
 def update_secondary_alchemy(id, by_session_state):
     if not by_session_state:
         character = get_character_by_id_alchemy(id)
@@ -666,3 +667,52 @@ def stat_adaption(input_value):
             break
 
     return output_value
+
+
+def insert_stat_alchemy(stat_data):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the stats table
+    table = Table('stats', metadata, autoload_with=engine)
+
+    # Check if provided columns exist in the table
+    existing_columns = set(column.name for column in list(table.columns))
+    for column in stat_data.keys():
+        if column not in existing_columns:
+            print(f"Column {column} does not exist in table stats.")
+            return
+
+    # Use SQLAlchemy's insert() to build the insert statement
+    stmt = insert(table).values(stat_data)
+    # Execute the statement
+    with engine.connect() as connection:
+        connection.execute(stmt)
+        connection.commit()
+
+stat = {
+    'name': 'nahkampf',
+    'description': 'Der Umgang mit Nahkampfwaffen und das Schadenspotential werden über diesen Wert bestimmt.'
+}
+insert_stat_alchemy(stat)
+
+            # 'nahkampf': nahkampf,
+            # 'fernkampf': fernkampf,
+            # 'parieren': parieren,
+            # 'entweichen': entweichen,
+            # 'zähigkeit': zähigkeit,
+            # 'ausweichen': ausweichen,
+            # 'tarnung': tarnung,
+            # 'fingerfertigkeit': fingerfertigkeit,
+            # 'schnelligkeit': schnelligkeit,
+            # 'nachsetzen': nachsetzen,
+            # 'luegen': luegen,
+            # 'etikette': etikette,
+            # 'handeln': handeln,
+            # 'ueberzeugen': ueberzeugen,
+            # 'einschuechtern': einschuechtern,
+            # 'mechanik': mechanik,
+            # 'aetherkunde': aetherkunde,
+            # 'xenos': xenos,
+            # 'handwerk': handwerk,
+            # 'steuerung': steuerung
