@@ -1,5 +1,5 @@
 from util import (get_values_alchemy, delete_character_alchemy, delete_data_alchemy, insert_character_alchemy,
-                  on_submit_click, insert_data_alchemy)
+                  on_submit_click, insert_data_alchemy,insert_stat_alchemy, get_stat_by_name_alchemy, update_stat_by_name)
 import streamlit as st
 import time
 
@@ -34,6 +34,23 @@ def delete_class():
         delete_data_alchemy('classes', st.session_state.delete)
         st.success(f"Class {st.session_state.delete} was successfully removed.")
         st.toast("Class successfully deleted", icon="✅")
+        time.sleep(2)
+        st.experimental_rerun()
+    return
+
+
+def delete_stat():
+    """
+
+    :return:
+    """
+    st.title("Delete Stat")
+    names_from_stat = get_values_alchemy('stats', 'name')
+    st.session_state.delete = st.selectbox("Select stat to delete", names_from_stat)
+    if st.button('Delete stat'):
+        delete_data_alchemy('stats', st.session_state.delete)
+        st.success(f"Stat {st.session_state.delete} was successfully removed.")
+        st.toast("Stat successfully deleted", icon="✅")
         time.sleep(2)
         st.experimental_rerun()
     return
@@ -245,6 +262,79 @@ def insert_race():
                 st.session_state.submitted = False
                 st.session_state.show_form = False
                 st.toast("Race successfully addded", icon="✅")
+                time.sleep(2)
+                st.experimental_rerun()
+    return
+
+
+def insert_stat():
+    """
+
+    :return:
+    """
+    st.title("Insert stat")
+    with st.form(key='race_form', clear_on_submit=True):
+        name = st.text_input('Name')
+        description = st.text_input('Description')
+        type_in = st.selectbox('Type', options=['numerical', 'functional'])
+        # Create the submit button
+        st.form_submit_button("Submit", on_click=on_submit_click)
+
+        # If the submit button is clicked, insert the new character into the SQLite database
+        if st.session_state.get('submitted', False):
+            if name == '':
+                st.warning('Please enter a name before submitting.')
+            elif name in get_values_alchemy('stats', 'name'):
+                st.warning('Name already taken. Please try something else')
+            else:
+                stats = {
+                    'name': name,
+                    'description': description,
+                    'type': type_in
+                }
+                insert_stat_alchemy(stats)
+                st.success('Stat added!')
+                st.session_state.submitted = False
+                st.session_state.show_form = False
+                st.toast("Stat added!", icon="✅")
+                time.sleep(2)
+                st.experimental_rerun()
+    return
+
+
+def update_stat():
+    """
+
+    :return:
+    """
+    st.title("Update stat")
+    names_from_stat = get_values_alchemy('stats', 'name')
+    st.session_state.update = st.selectbox("Select stat to update", names_from_stat)
+    from_stats = get_stat_by_name_alchemy(st.session_state.update)
+    with st.form(key='stat_form', clear_on_submit=True):
+        name = st.text_input('Name', from_stats(1))
+        description = st.text_input('Description', from_stats(2))
+        new_type = st.selectbox('Type', options=['numerical', 'functional'], index=0 if from_stats(3) == 'numerical' else 1)
+        # Create the submit button
+        st.form_submit_button("Submit", on_click=on_submit_click)
+
+        # If the submit button is clicked, insert the new character into the SQLite database
+        if st.session_state.get('submitted', False):
+            if name == '':
+                st.warning('Please enter a name before submitting.')
+            elif name in get_values_alchemy('stats', 'name'):
+                st.warning('Name already taken. Please try something else')
+            else:
+                stats = {
+                    'name': name,
+                    'description': description,
+                    'type': new_type
+                }
+                update_stat_by_name(from_stats(1), stats)
+                st.success('Stat updated!')
+                st.session_state.submitted = False
+                st.session_state.show_form = False
+                st.toast("Stat updated!", icon="✅")
                 time.sleep(2)
                 st.experimental_rerun()
     return

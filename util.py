@@ -121,6 +121,28 @@ def get_character_by_name_alchemy(in_name):
     return None
 
 
+def get_stat_by_name_alchemy(in_name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the table
+    stats_table = Table('stats', metadata, autoload_with=engine)
+
+    # Construct the SELECT statement
+    stmt = select(stats_table).where(stats_table.c.name == in_name)
+
+    # Execute the statement and fetch the result
+    with engine.connect() as connection:
+        result = connection.execute(stmt).fetchone()
+
+    # If a record was found, return it as a dictionary
+    if result:
+        return result
+
+    # If no record was found, return None
+    return None
+
+
 def get_character_by_id_alchemy(in_id):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -690,29 +712,54 @@ def insert_stat_alchemy(stat_data):
         connection.execute(stmt)
         connection.commit()
 
-stat = {
-    'name': 'nahkampf',
-    'description': 'Der Umgang mit Nahkampfwaffen und das Schadenspotential werden über diesen Wert bestimmt.'
-}
-insert_stat_alchemy(stat)
 
-            # 'nahkampf': nahkampf,
-            # 'fernkampf': fernkampf,
-            # 'parieren': parieren,
-            # 'entweichen': entweichen,
-            # 'zähigkeit': zähigkeit,
-            # 'ausweichen': ausweichen,
-            # 'tarnung': tarnung,
-            # 'fingerfertigkeit': fingerfertigkeit,
-            # 'schnelligkeit': schnelligkeit,
-            # 'nachsetzen': nachsetzen,
-            # 'luegen': luegen,
-            # 'etikette': etikette,
-            # 'handeln': handeln,
-            # 'ueberzeugen': ueberzeugen,
-            # 'einschuechtern': einschuechtern,
-            # 'mechanik': mechanik,
-            # 'aetherkunde': aetherkunde,
-            # 'xenos': xenos,
-            # 'handwerk': handwerk,
-            # 'steuerung': steuerung
+def update_stat_by_name(original_stat_name, updated_values):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the stats table
+    table = Table('stats', metadata, autoload_with=engine)
+
+    # Use SQLAlchemy's update() to build the update statement
+    stmt = (
+        update(table)
+        .where(table.c.name == original_stat_name)
+        .values(updated_values)
+    )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    return result.rowcount  # This will return the number of updated rows
+
+
+# stat = {
+#     'name': 'nahkampf',
+#     'description': 'Der Umgang mit Nahkampfwaffen und das Schadenspotential werden über diesen Wert bestimmt.'
+# }
+# insert_stat_alchemy(stat)
+
+# 'nahkampf': nahkampf,
+# 'fernkampf': fernkampf,
+# 'parieren': parieren,
+# 'entweichen': entweichen,
+# 'zähigkeit': zähigkeit,
+# 'ausweichen': ausweichen,
+# 'tarnung': tarnung,
+# 'fingerfertigkeit': fingerfertigkeit,
+# 'schnelligkeit': schnelligkeit,
+# 'nachsetzen': nachsetzen,
+# 'luegen': luegen,
+# 'etikette': etikette,
+# 'handeln': handeln,
+# 'ueberzeugen': ueberzeugen,
+# 'einschuechtern': einschuechtern,
+# 'mechanik': mechanik,
+# 'aetherkunde': aetherkunde,
+# 'xenos': xenos,
+# 'handwerk': handwerk,
+# 'steuerung': steuerung
+
+# print(get_stat_by_name_alchemy('a'))
