@@ -309,12 +309,12 @@ def update_stat():
     """
     st.title("Update stat")
     names_from_stat = get_values_alchemy('stats', 'name')
-    st.session_state.update = st.selectbox("Select stat to update", names_from_stat)
-    from_stats = get_stat_by_name_alchemy(st.session_state.update)
+    update_value = st.selectbox("Select stat to update", names_from_stat)
+    from_stats = get_stat_by_name_alchemy(update_value)
     with st.form(key='stat_form', clear_on_submit=True):
-        name = st.text_input('Name', from_stats(1))
-        description = st.text_input('Description', from_stats(2))
-        new_type = st.selectbox('Type', options=['numerical', 'functional'], index=0 if from_stats(3) == 'numerical' else 1)
+        name = st.text_input('Name', from_stats[1])
+        description = st.text_input('Description', from_stats[2])
+        new_type = st.selectbox('Type', options=['numerical', 'functional'], index=0 if from_stats[3] == 'numerical' else 1)
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
 
@@ -330,7 +330,8 @@ def update_stat():
                     'description': description,
                     'type': new_type
                 }
-                update_stat_by_name(from_stats(1), stats)
+                update_stat_by_name(from_stats[1], stats)
+
                 st.success('Stat updated!')
                 st.session_state.submitted = False
                 st.session_state.show_form = False
