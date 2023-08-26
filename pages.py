@@ -350,7 +350,6 @@ def edit_item():
     item_id = get_id('items', show_item)
     item = get_item_from_id(item_id)
     st.subheader(item[0][0])
-
     name = st.text_input('Name', item[0][0])
     image = st.text_input('Image URL', item[0][1])
     st.session_state.show_image = image
@@ -362,18 +361,27 @@ def edit_item():
     st.divider()
 
     col_stat, col_value, col_button = st.columns(3)
-    get_values_alchemy('stats', name)
+    stat_names = get_values_alchemy('stats', 'name')
     with col_stat:
-        st.header("A cat")
-        st.image("https://static.streamlit.io/examples/cat.jpg")
+        st.selectbox("Stat", stat_names)
 
     with col_value:
-        st.header("A dog")
-        st.image("https://static.streamlit.io/examples/dog.jpg")
+        st.number_input("Value", step = 1)
 
     with col_button:
-        st.header("An owl")
-        st.image("https://static.streamlit.io/examples/owl.jpg")
+        st.markdown("""
+        <style>
+        .blocker {
+            font-size:0px;
+            opacity:0;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+        st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
+        st.button(":heavy_plus_sign:", type = "primary")
+
+
+
     # Create the submit button
     # st.form_submit_button("Submit", on_click=on_submit_click)
 
