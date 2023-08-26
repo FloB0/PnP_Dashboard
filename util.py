@@ -540,8 +540,13 @@ def decrement_or_delete_character_item(data):
         connection.commit()
 
 
+def show_image(image_url):
+    st.session_state.show_image = image_url
+    return
+
+
 def delete_item_from_character(character_id, item_name):
-    item_id = get_id(item_name)
+    item_id = get_id('items', item_name)
 
     if not item_id:
         return

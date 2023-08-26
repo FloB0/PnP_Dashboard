@@ -1,5 +1,6 @@
 from util import (get_values_alchemy, delete_character_alchemy, delete_data_alchemy, insert_character_alchemy,
-                  on_submit_click, insert_data_alchemy,insert_stat_alchemy, get_stat_by_name_alchemy, update_stat_by_name)
+                  on_submit_click, insert_data_alchemy, insert_stat_alchemy, get_stat_by_name_alchemy,
+                  update_stat_by_name, get_id, get_item_from_id, show_image)
 import streamlit as st
 import time
 
@@ -314,7 +315,8 @@ def update_stat():
     with st.form(key='stat_form', clear_on_submit=True):
         name = st.text_input('Name', from_stats[1])
         description = st.text_input('Description', from_stats[2])
-        new_type = st.selectbox('Type', options=['numerical', 'functional'], index=0 if from_stats[3] == 'numerical' else 1)
+        new_type = st.selectbox('Type', options=['numerical', 'functional'],
+                                index=0 if from_stats[3] == 'numerical' else 1)
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
 
@@ -338,6 +340,63 @@ def update_stat():
                 st.toast("Stat updated!", icon="✅")
                 time.sleep(2)
                 st.experimental_rerun()
+    return
+
+
+def edit_item():
+    st.title("Edit Item")
+    item_from_dropdown = get_values_alchemy('items', 'name')
+    show_item = st.selectbox("Select item to edit", item_from_dropdown)
+    item_id = get_id('items', show_item)
+    item = get_item_from_id(item_id)
+    st.subheader(item[0][0])
+
+    name = st.text_input('Name', item[0][0])
+    image = st.text_input('Image URL', item[0][1])
+    st.session_state.show_image = image
+    # st.button("Show picture..")
+    if 'show_image' in st.session_state:
+        st.image(st.session_state.show_image)
+    description = st.text_input('Description', item[0][2])
+
+    st.divider()
+
+    col_stat, col_value, col_button = st.columns(3)
+    get_values_alchemy('stats', name)
+    with col_stat:
+        st.header("A cat")
+        st.image("https://static.streamlit.io/examples/cat.jpg")
+
+    with col_value:
+        st.header("A dog")
+        st.image("https://static.streamlit.io/examples/dog.jpg")
+
+    with col_button:
+        st.header("An owl")
+        st.image("https://static.streamlit.io/examples/owl.jpg")
+    # Create the submit button
+    # st.form_submit_button("Submit", on_click=on_submit_click)
+
+    # If the submit button is clicked, insert the new character into the SQLite database
+    # if st.session_state.get('submitted', False):
+    #     if name == '':
+    #         st.warning('Please enter a name before submitting.')
+    #     elif name in get_values_alchemy('stats', 'name'):
+    #         st.warning('Name already taken. Please try something else')
+    #     else:
+    #         stats = {
+    #             'name': name,
+    #             'description': description,
+    #             'type': new_type
+    #         }
+    #         update_stat_by_name(from_stats[1], stats)
+    #
+    #         st.success('Stat updated!')
+    #         st.session_state.submitted = False
+    #         st.session_state.show_form = False
+    #         st.toast("Stat updated!", icon="✅")
+    #         time.sleep(2)
+    #         st.experimental_rerun()
     return
 
 
