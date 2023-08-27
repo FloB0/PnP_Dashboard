@@ -1,8 +1,10 @@
 from util import (get_values_alchemy, delete_character_alchemy, delete_data_alchemy, insert_character_alchemy,
                   on_submit_click, insert_data_alchemy, insert_stat_alchemy, get_stat_by_name_alchemy,
-                  update_stat_by_name, get_id, get_item_from_id, show_image)
+                  update_stat_by_name, get_id, get_item_from_id, show_image, insert_stat_item_relation_alchemy,
+                  get_stat_id, get_stats_for_item)
 import streamlit as st
 import time
+from annotated_text import annotated_text
 
 
 def delete_character():
@@ -359,14 +361,20 @@ def edit_item():
     description = st.text_input('Description', item[0][2])
 
     st.divider()
+    st.session_state.item_stats = get_stats_for_item(item_id)
+    for active_stat in st.session_state.item_stats:
+        annotated_text(
+            (str(active_stat['value']), active_stat['name'], )
+        )
 
+    st.divider()
     col_stat, col_value, col_button = st.columns(3)
     stat_names = get_values_alchemy('stats', 'name')
     with col_stat:
-        st.selectbox("Stat", stat_names)
-
+        in_stat_name = st.selectbox("Stat", stat_names)
+        stat_id = get_stat_id('stats', in_stat_name)
     with col_value:
-        st.number_input("Value", step = 1)
+        in_value = st.number_input("Value", step=1)
 
     with col_button:
         st.markdown("""
@@ -378,9 +386,9 @@ def edit_item():
         </style>
         """, unsafe_allow_html=True)
         st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
-        st.button(":heavy_plus_sign:", type = "primary")
-
-
+        st.button(":heavy_plus_sign:", type="primary", on_click=insert_stat_item_relation_alchemy, args=(
+            {'item_id': item_id, 'stat_id': stat_id, 'value': in_value},)
+                  )
 
     # Create the submit button
     # st.form_submit_button("Submit", on_click=on_submit_click)

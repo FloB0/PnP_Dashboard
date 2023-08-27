@@ -490,6 +490,25 @@ def get_id(table_name, name):
             return None
 
 
+def get_stat_id(table_name, name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Assuming the table where items are stored is named 'Items'
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Create the select statement to get the ItemID for a given item name
+    stmt = select(table.c.stat_id).where(table.c.name == name)
+
+    with engine.connect() as connection:
+        result = connection.execute(stmt).fetchone()
+        if result:
+            return result[0]
+        else:
+            print(f"No ItemID found for item name: {name}")
+            return None
+
+
 def add_item_to_character(character_id, item_name):
     item_id = get_id(table_name='items', name=item_name)
 
@@ -503,6 +522,35 @@ def add_item_to_character(character_id, item_name):
 
     # Here you call your previously created function
     insert_or_increment_character_item(data)
+
+
+def get_stats_for_item(item_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats and stats tables
+    item_stats_table = Table('item_stats', metadata, autoload_with=engine)
+    stats_table = Table('stats', metadata, autoload_with=engine)
+
+    # Construct the SELECT statement with JOIN
+    stmt = (
+        select(
+            item_stats_table.c.stat_id,
+            stats_table.c.name,
+            item_stats_table.c.value
+        )
+        .join(stats_table, item_stats_table.c.stat_id == stats_table.c.stat_id)
+        .where(item_stats_table.c.item_id == item_id)
+    )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt).fetchall()
+
+    # Convert results into a list of dictionaries for easier processing
+    stats_data = [{"stat_id": row[0], "name": row[1], "value": row[2]} for row in result]
+
+    return stats_data
 
 
 def decrement_or_delete_character_item(data):
@@ -712,6 +760,28 @@ def insert_stat_alchemy(stat_data):
 
     # Use SQLAlchemy's insert() to build the insert statement
     stmt = insert(table).values(stat_data)
+    # Execute the statement
+    with engine.connect() as connection:
+        connection.execute(stmt)
+        connection.commit()
+
+
+def insert_stat_item_relation_alchemy(relation_data):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats table
+    table = Table('item_stats', metadata, autoload_with=engine)
+
+    # Check if provided columns exist in the table
+    existing_columns = set(column.name for column in list(table.columns))
+    for column in relation_data.keys():
+        if column not in existing_columns:
+            print(f"Column {column} does not exist in table item_stats.")
+            return
+
+    # Use SQLAlchemy's insert() to build the insert statement
+    stmt = insert(table).values(relation_data)
     # Execute the statement
     with engine.connect() as connection:
         connection.execute(stmt)
