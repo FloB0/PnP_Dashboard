@@ -810,6 +810,67 @@ def update_stat_by_name(original_stat_name, updated_values):
     return result.rowcount  # This will return the number of updated rows
 
 
+def upsert_stat_for_item(args):
+    item_id = args['item_id']
+    stat_id = args['stat_id']
+    value = args['value']
+
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats table
+    item_stats_table = Table('item_stats', metadata, autoload_with=engine)
+
+    # First, check if the stat already exists for the item
+    stmt = (
+        select(item_stats_table.c.stat_id)
+        .where(
+            (item_stats_table.c.item_id == item_id) &
+            (item_stats_table.c.stat_id == stat_id)
+        )
+    )
+
+    with engine.connect() as connection:
+        existing_stat = connection.execute(stmt).fetchone()
+
+        if existing_stat:  # If the stat already exists for the item, update the value
+            update_stmt = (
+                update(item_stats_table)
+                .where(
+                    (item_stats_table.c.item_id == item_id) &
+                    (item_stats_table.c.stat_id == stat_id)
+                )
+                .values(value=value)
+            )
+            connection.execute(update_stmt)
+        else:  # If the stat does not exist, insert a new row
+            insert_stmt = item_stats_table.insert().values(item_id=item_id, stat_id=stat_id, value=value)
+            connection.execute(insert_stmt)
+
+        connection.commit()
+
+
+def delete_item_stat_relation(item_id, stat_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats table
+    table = Table('item_stats', metadata, autoload_with=engine)
+
+    # Construct the DELETE statement
+    stmt = delete(table).where(
+        (table.c.item_id == item_id) & (table.c.stat_id == stat_id)
+    )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    print(f"Deleted {result.rowcount} rows.")
+
+
+
 # stat = {
 #     'name': 'nahkampf',
 #     'description': 'Der Umgang mit Nahkampfwaffen und das Schadenspotential werden über diesen Wert bestimmt.'

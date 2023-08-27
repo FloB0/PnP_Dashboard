@@ -1,7 +1,7 @@
 from util import (get_values_alchemy, delete_character_alchemy, delete_data_alchemy, insert_character_alchemy,
                   on_submit_click, insert_data_alchemy, insert_stat_alchemy, get_stat_by_name_alchemy,
                   update_stat_by_name, get_id, get_item_from_id, show_image, insert_stat_item_relation_alchemy,
-                  get_stat_id, get_stats_for_item)
+                  get_stat_id, get_stats_for_item, upsert_stat_for_item, delete_item_stat_relation)
 import streamlit as st
 import time
 from annotated_text import annotated_text
@@ -362,11 +362,32 @@ def edit_item():
 
     st.divider()
     st.session_state.item_stats = get_stats_for_item(item_id)
+    print(st.session_state.item_stats)
+    c_stat_value, c_button, c_fill = st.columns(3)
     for active_stat in st.session_state.item_stats:
-        annotated_text(
-            (str(active_stat['value']), active_stat['name'], )
-        )
-
+        with c_stat_value:
+            annotated_text(
+                (str(active_stat['value']), active_stat['name'], )
+            )
+        with c_button:
+            st.markdown(
+                """
+            <style>
+            button {
+                height: auto;
+                padding-top: 10px !important;
+                padding-bottom: 10px !important;
+            }
+            </style>
+            """,
+                unsafe_allow_html=True,
+            )
+            uni_key = str(item_id) + str(active_stat['stat_id']) + "_button"
+            print(uni_key)
+            st.button(":heavy_minus_sign:", type="primary", key= uni_key, on_click=delete_item_stat_relation, args=(item_id,
+                                                                                                     active_stat['stat_id']))
+        with c_fill:
+            st.text("")
     st.divider()
     col_stat, col_value, col_button = st.columns(3)
     stat_names = get_values_alchemy('stats', 'name')
@@ -385,9 +406,10 @@ def edit_item():
         }
         </style>
         """, unsafe_allow_html=True)
+
         st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
-        st.button(":heavy_plus_sign:", type="primary", on_click=insert_stat_item_relation_alchemy, args=(
-            {'item_id': item_id, 'stat_id': stat_id, 'value': in_value},)
+        st.button(":heavy_plus_sign:", type="primary", on_click=upsert_stat_for_item, args=(
+            {'item_id': item_id, 'stat_id': stat_id, 'value': in_value},), key=uni_key
                   )
 
     # Create the submit button
