@@ -389,12 +389,12 @@ def edit_item():
             """,
                 unsafe_allow_html=True,
             )
-            uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
-            print(uni_key)
-            print(f"Before button creation with key: {uni_key}")
-            st.button(":wastebasket:", type="secondary", key=uni_key, on_click=delete_item_stat_relation, args=(item_id,
+            # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
+            # print(uni_key)
+            # print(f"Before button creation with key: {uni_key}")
+            st.button(":wastebasket:", type="secondary", key=active_stat['name'], on_click=delete_item_stat_relation, args=(item_id,
                                                                                                      active_stat['stat_id']))
-            print(f"After button creation with key: {uni_key}")
+            # print(f"After button creation with key: {uni_key}")
         with c_fill:
             st.text("")
     st.divider()
@@ -418,7 +418,7 @@ def edit_item():
 
         st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
         st.button(":heavy_plus_sign:", type="primary", on_click=upsert_stat_for_item, args=(
-            {'item_id': item_id, 'stat_id': stat_id, 'value': in_value},), key=uni_key
+            {'item_id': item_id, 'stat_id': stat_id, 'value': in_value},), key="add_stat_button"
                   )
 
     # Create the submit button
