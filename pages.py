@@ -3,7 +3,7 @@ import random
 from util import (get_values_alchemy, delete_character_alchemy, delete_data_alchemy, insert_character_alchemy,
                   on_submit_click, insert_data_alchemy, insert_stat_alchemy, get_stat_by_name_alchemy,
                   update_stat_by_name, get_id, get_item_from_id, show_image, insert_stat_item_relation_alchemy,
-                  get_stat_id, get_stats_for_item, upsert_stat_for_item, delete_item_stat_relation)
+                  get_stat_id, get_stats_for_item, upsert_stat_for_item, delete_item_stat_relation, insert_trait_alchemy)
 import streamlit as st
 import time
 import uuid
@@ -303,6 +303,41 @@ def insert_stat():
                 st.session_state.submitted = False
                 st.session_state.show_form = False
                 st.toast("Stat added!", icon="✅")
+                time.sleep(2)
+                st.experimental_rerun()
+    return
+
+
+def insert_trait():
+    """
+
+    :return:
+    """
+    st.title("Insert trait")
+    with st.form(key='trait_form', clear_on_submit=True):
+        name = st.text_input('Trait Name')
+        description = st.text_input('Description')
+        type_in = st.selectbox('Type', options=['numerical', 'functional'])
+        # Create the submit button
+        st.form_submit_button("Submit", on_click=on_submit_click)
+
+        # If the submit button is clicked, insert the new character into the SQLite database
+        if st.session_state.get('submitted', False):
+            if name == '':
+                st.warning('Please enter a name before submitting.')
+            elif name in get_values_alchemy('traits', 'trait_name'):
+                st.warning('Name already taken. Please try something else')
+            else:
+                trait = {
+                    'trait_name': name,
+                    'description': description,
+                    'type': type_in
+                }
+                insert_trait_alchemy(trait)
+                st.success('Trait added!')
+                st.session_state.submitted = False
+                st.session_state.show_form = False
+                st.toast("Trait added!", icon="✅")
                 time.sleep(2)
                 st.experimental_rerun()
     return

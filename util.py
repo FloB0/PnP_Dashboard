@@ -766,6 +766,28 @@ def insert_stat_alchemy(stat_data):
         connection.commit()
 
 
+def insert_trait_alchemy(trait_data):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the stats table
+    table = Table('traits', metadata, autoload_with=engine)
+
+    # Check if provided columns exist in the table
+    existing_columns = set(column.name for column in list(table.columns))
+    for column in trait_data.keys():
+        if column not in existing_columns:
+            print(f"Column {column} does not exist in table stats.")
+            return
+
+    # Use SQLAlchemy's insert() to build the insert statement
+    stmt = insert(table).values(trait_data)
+    # Execute the statement
+    with engine.connect() as connection:
+        connection.execute(stmt)
+        connection.commit()
+
+
 def insert_stat_item_relation_alchemy(relation_data):
     engine = init_connection_alchemy()
     metadata = MetaData()
