@@ -3,7 +3,9 @@ import random
 from util import (get_values_alchemy, delete_character_alchemy, delete_data_alchemy, insert_character_alchemy,
                   on_submit_click, insert_data_alchemy, insert_stat_alchemy, get_stat_by_name_alchemy,
                   update_stat_by_name, get_id, get_item_from_id, show_image, insert_stat_item_relation_alchemy,
-                  get_stat_id, get_stats_for_item, upsert_stat_for_item, delete_item_stat_relation, insert_trait_alchemy)
+                  get_stat_id, get_stats_for_item, upsert_stat_for_item, delete_item_stat_relation,
+                  insert_trait_alchemy, get_trait_from_id, get_trait_by_name_alchemy, update_trait_by_name,
+                  get_stats_for_trait, delete_trait_stat_relation, upsert_stat_for_trait, get_trait_id)
 import streamlit as st
 import time
 import uuid
@@ -383,6 +385,46 @@ def update_stat():
     return
 
 
+def update_trait():
+    """
+
+    :return:
+    """
+    st.title("Update trait")
+    names_from_stat = get_values_alchemy('traits', 'trait_name')
+    update_value = st.selectbox("Select trait to update", names_from_stat)
+    from_stats = get_trait_by_name_alchemy(update_value)
+    with st.form(key='trait_form', clear_on_submit=True):
+        name = st.text_input('Name', from_stats[1])
+        description = st.text_input('Description', from_stats[2])
+        new_type = st.selectbox('Type', options=['numerical', 'functional'],
+                                index=0 if from_stats[3] == 'numerical' else 1)
+        # Create the submit button
+        st.form_submit_button("Submit", on_click=on_submit_click)
+
+        # If the submit button is clicked, insert the new character into the SQLite database
+        if st.session_state.get('submitted', False):
+            if name == '':
+                st.warning('Please enter a name before submitting.')
+            elif name in get_values_alchemy('traits', 'trait_name'):
+                st.warning('Name already taken. Please try something else')
+            else:
+                trait = {
+                    'trait_name': name,
+                    'description': description,
+                    'type': new_type
+                }
+                update_trait_by_name(from_stats[1], trait)
+
+                st.success('Trait updated!')
+                st.session_state.submitted = False
+                st.session_state.show_form = False
+                st.toast("Trait updated!", icon="✅")
+                time.sleep(2)
+                st.experimental_rerun()
+    return
+
+
 def edit_item():
     st.title("Edit Item")
     item_from_dropdown = get_values_alchemy('items', 'name')
@@ -455,30 +497,88 @@ def edit_item():
         st.button(":heavy_plus_sign:", type="primary", on_click=upsert_stat_for_item, args=(
             {'item_id': item_id, 'stat_id': stat_id, 'value': in_value},), key="add_stat_button"
                   )
+    return
 
-    # Create the submit button
-    # st.form_submit_button("Submit", on_click=on_submit_click)
 
-    # If the submit button is clicked, insert the new character into the SQLite database
-    # if st.session_state.get('submitted', False):
-    #     if name == '':
-    #         st.warning('Please enter a name before submitting.')
-    #     elif name in get_values_alchemy('stats', 'name'):
-    #         st.warning('Name already taken. Please try something else')
-    #     else:
-    #         stats = {
-    #             'name': name,
-    #             'description': description,
-    #             'type': new_type
-    #         }
-    #         update_stat_by_name(from_stats[1], stats)
-    #
-    #         st.success('Stat updated!')
-    #         st.session_state.submitted = False
-    #         st.session_state.show_form = False
-    #         st.toast("Stat updated!", icon="✅")
-    #         time.sleep(2)
-    #         st.experimental_rerun()
+def edit_trait():
+    st.title("Edit Trait")
+    trait_from_dropdown = get_values_alchemy('traits', 'trait_name')
+    show_trait = st.selectbox("Select trait to edit", trait_from_dropdown)
+    trait_id = get_trait_id('traits', show_trait)
+    trait = get_trait_from_id(trait_id)
+    st.subheader(trait[0][0])
+    st.text("descr")
+    # name = st.text_input('Name', trait[0][0])
+    # description = st.text_input('Description', item[0][2])
+    # type = st.selectbox('Type', options=['numerical', 'functional'], )
+
+    # # st.button("Show picture..")
+    # if 'show_image' in st.session_state:
+    #     st.image(st.session_state.show_image)
+    # description = st.text_input('Description', item[0][2])
+
+    st.divider()
+    st.session_state.trait_stats = get_stats_for_trait(trait_id)
+    print(st.session_state.trait_stats)
+    c_trait_value, c_trait_button, c_trait_fill = st.columns([5,2,25])
+    print("st.session_state.trait_stats: ", st.session_state.trait_stats)
+    for active_trait in st.session_state.trait_stats:
+        print('active_stat: ', active_trait)
+        with c_trait_value:
+            # if active_trait['type'] == 'numerical':
+            #     filler = active_trait['value']
+            # elif active_trait['type'] == 'functional':
+            #     filler = active_trait['description']
+            filler = active_trait['value']
+            annotated_text(
+                annotation(str(filler), active_trait['name'], font_size='25px', padding_top="16px", padding_bottom="16px")
+            )
+        with c_trait_button:
+            st.markdown(
+                """
+            <style>
+            button {
+                height: 5px;
+                padding-top: 5px !important;
+                padding-bottom: 5px !important;
+                padding-right: 5px !important;
+                padding-left: 5px !important;
+            }
+            </style>
+            """,
+                unsafe_allow_html=True,
+            )
+            # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
+            # print(uni_key)
+            # print(f"Before button creation with key: {uni_key}")
+            st.button(":wastebasket:", type="secondary", key=active_trait['name'], on_click=delete_trait_stat_relation, args=(trait_id,
+                                                                                                     active_trait['stat_id']))
+            # print(f"After button creation with key: {uni_key}")
+        with c_trait_fill:
+            st.text("")
+    st.divider()
+    col_trait, col_trait_value, col_trait_button = st.columns(3)
+    stat_names = get_values_alchemy('stats', 'name')
+    with col_trait:
+        in_stat_name = st.selectbox("Trait", stat_names)
+        stat_id = get_stat_id('stats', in_stat_name)
+    with col_trait_value:
+        in_value = st.number_input("Value", step=1)
+
+    with col_trait_button:
+        st.markdown("""
+        <style>
+        .blocker {
+            font-size:0px;
+            opacity:0;
+        }
+        </style>
+        """, unsafe_allow_html=True)
+
+        st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
+        st.button(":heavy_plus_sign:", type="primary", on_click=upsert_stat_for_trait, args=(
+            {'trait_id': trait_id, 'stat_id': stat_id, 'value': in_value},), key="add_trait_button"
+                  )
     return
 
 

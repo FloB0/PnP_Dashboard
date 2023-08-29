@@ -1,5 +1,5 @@
 from pages import (insert_character, insert_class, insert_item, insert_race, delete_character, delete_item, delete_race, \
-                   delete_class, empty_page, insert_stat, delete_stat, update_stat, edit_item, insert_trait)
+                   delete_class, empty_page, insert_stat, delete_stat, update_stat, edit_item, insert_trait, update_trait, edit_trait)
 import streamlit as st
 
 st.set_page_config(
@@ -22,7 +22,9 @@ page_names_to_funcs = {
     "Delete Class": delete_class,
     "Delete Stat": delete_stat,
     "Edit Item": edit_item,
-    "Insert Trait": insert_trait
+    "Insert Trait": insert_trait,
+    "Update Trait": update_trait,
+    "Edit Trait": edit_trait
 }
 
 page_name = st.selectbox("Chose what you want to do:", page_names_to_funcs.keys())

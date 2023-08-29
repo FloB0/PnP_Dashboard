@@ -143,6 +143,28 @@ def get_stat_by_name_alchemy(in_name):
     return None
 
 
+def get_trait_by_name_alchemy(in_name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the table
+    stats_table = Table('traits', metadata, autoload_with=engine)
+
+    # Construct the SELECT statement
+    stmt = select(stats_table).where(stats_table.c.trait_name == in_name)
+
+    # Execute the statement and fetch the result
+    with engine.connect() as connection:
+        result = connection.execute(stmt).fetchone()
+
+    # If a record was found, return it as a dictionary
+    if result:
+        return result
+
+    # If no record was found, return None
+    return None
+
+
 def get_character_by_id_alchemy(in_id):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -509,6 +531,25 @@ def get_stat_id(table_name, name):
             return None
 
 
+def get_trait_id(table_name, name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Assuming the table where items are stored is named 'Items'
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Create the select statement to get the ItemID for a given item name
+    stmt = select(table.c.trait_id).where(table.c.trait_name == name)
+
+    with engine.connect() as connection:
+        result = connection.execute(stmt).fetchone()
+        if result:
+            return result[0]
+        else:
+            print(f"No ItemID found for item name: {name}")
+            return None
+
+
 def add_item_to_character(character_id, item_name):
     item_id = get_id(table_name='items', name=item_name)
 
@@ -552,6 +593,34 @@ def get_stats_for_item(item_id):
 
     return stats_data
 
+
+def get_stats_for_trait(trait_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats and stats tables
+    trait_stats_table = Table('trait_stats', metadata, autoload_with=engine)
+    stats_table = Table('stats', metadata, autoload_with=engine)
+
+    # Construct the SELECT statement with JOIN
+    stmt = (
+        select(
+            trait_stats_table.c.stat_id,
+            stats_table.c.name,
+            trait_stats_table.c.value
+        )
+        .join(stats_table, trait_stats_table.c.stat_id == stats_table.c.stat_id)
+        .where(trait_stats_table.c.trait_id == trait_id)
+    )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt).fetchall()
+
+    # Convert results into a list of dictionaries for easier processing
+    stats_data = [{"stat_id": row[0], "name": row[1], "value": row[2]} for row in result]
+
+    return stats_data
 
 def decrement_or_delete_character_item(data):
     engine = init_connection_alchemy()
@@ -653,6 +722,30 @@ def get_item_from_id(itemID):
             return items_dict
         else:
             print(f"No items found for characterID: {itemID}")
+            return {}
+
+
+def get_trait_from_id(traitID):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # We'll specifically target the 'character_items' table
+    table_name = 'traits'
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Create the select statement to get all itemID and quantity for the specified characterID
+    stmt = select(table.c.trait_name, table.c.type, table.c.description).where(table.c.trait_id == traitID)
+
+    with engine.connect() as connection:
+        results = connection.execute(stmt).fetchall()
+
+        # Check if we have any results
+        if results:
+            # Convert the results into a dictionary format for easier access
+            trait_dict = results
+            return trait_dict
+        else:
+            print(f"No items found for characterID: {traitID}")
             return {}
 
 
@@ -832,6 +925,28 @@ def update_stat_by_name(original_stat_name, updated_values):
     return result.rowcount  # This will return the number of updated rows
 
 
+def update_trait_by_name(original_trait_name, updated_values):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the stats table
+    table = Table('traits', metadata, autoload_with=engine)
+
+    # Use SQLAlchemy's update() to build the update statement
+    stmt = (
+        update(table)
+        .where(table.c.trait_name == original_trait_name)
+        .values(updated_values)
+    )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    return result.rowcount  # This will return the number of updated rows
+
+
 def upsert_stat_for_item(args):
     item_id = args['item_id']
     stat_id = args['stat_id']
@@ -872,6 +987,46 @@ def upsert_stat_for_item(args):
         connection.commit()
 
 
+def upsert_stat_for_trait(args):
+    trait_id = args['trait_id']
+    stat_id = args['stat_id']
+    value = args['value']
+
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats table
+    trait_stats_table = Table('trait_stats', metadata, autoload_with=engine)
+
+    # First, check if the stat already exists for the item
+    stmt = (
+        select(trait_stats_table.c.stat_id)
+        .where(
+            (trait_stats_table.c.trait_id == trait_id) &
+            (trait_stats_table.c.stat_id == stat_id)
+        )
+    )
+
+    with engine.connect() as connection:
+        existing_stat = connection.execute(stmt).fetchone()
+
+        if existing_stat:  # If the stat already exists for the item, update the value
+            update_stmt = (
+                update(trait_stats_table)
+                .where(
+                    (trait_stats_table.c.trait_id == trait_id) &
+                    (trait_stats_table.c.stat_id == stat_id)
+                )
+                .values(value=value)
+            )
+            connection.execute(update_stmt)
+        else:  # If the stat does not exist, insert a new row
+            insert_stmt = trait_stats_table.insert().values(trait_id=trait_id, stat_id=stat_id, value=value)
+            connection.execute(insert_stmt)
+
+        connection.commit()
+
+
 def delete_item_stat_relation(item_id, stat_id):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -882,6 +1037,26 @@ def delete_item_stat_relation(item_id, stat_id):
     # Construct the DELETE statement
     stmt = delete(table).where(
         (table.c.item_id == item_id) & (table.c.stat_id == stat_id)
+    )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    print(f"Deleted {result.rowcount} rows.")
+
+
+def delete_trait_stat_relation(trait_id, stat_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats table
+    table = Table('trait_stats', metadata, autoload_with=engine)
+
+    # Construct the DELETE statement
+    stmt = delete(table).where(
+        (table.c.trait_id == trait_id) & (table.c.stat_id == stat_id)
     )
 
     # Execute the statement
