@@ -366,7 +366,7 @@ def update_stat():
         if st.session_state.get('submitted', False):
             if name == '':
                 st.warning('Please enter a name before submitting.')
-            elif name in get_values_alchemy('stats', 'name'):
+            elif name in get_values_alchemy('stats', 'name') and update_value != name:
                 st.warning('Name already taken. Please try something else')
             else:
                 stats = {
@@ -406,7 +406,7 @@ def update_trait():
         if st.session_state.get('submitted', False):
             if name == '':
                 st.warning('Please enter a name before submitting.')
-            elif name in get_values_alchemy('traits', 'trait_name'):
+            elif name in get_values_alchemy('traits', 'trait_name') and update_value != name:
                 st.warning('Name already taken. Please try something else')
             else:
                 trait = {
@@ -507,7 +507,9 @@ def edit_trait():
     trait_id = get_trait_id('traits', show_trait)
     trait = get_trait_from_id(trait_id)
     st.subheader(trait[0][0])
-    st.text("descr")
+    st.text(trait[0][1])
+    st.text("This trait is "+ trait[0][2])
+
     # name = st.text_input('Name', trait[0][0])
     # description = st.text_input('Description', item[0][2])
     # type = st.selectbox('Type', options=['numerical', 'functional'], )
