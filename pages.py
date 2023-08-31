@@ -1,11 +1,13 @@
 import random
 
-from util import (get_values_alchemy, delete_character_alchemy, delete_data_alchemy, insert_character_alchemy,
-                  on_submit_click, insert_data_alchemy, insert_stat_alchemy, get_stat_by_name_alchemy,
-                  update_stat_by_name, get_id, get_item_from_id, show_image, insert_stat_item_relation_alchemy,
-                  get_stat_id, get_stats_for_item, upsert_stat_for_item, delete_item_stat_relation,
-                  insert_trait_alchemy, get_trait_from_id, get_trait_by_name_alchemy, update_trait_by_name,
-                  get_stats_for_trait, delete_trait_stat_relation, upsert_stat_for_trait, get_trait_id)
+from util import (
+    get_values_alchemy, delete_character_alchemy, delete_data_alchemy, insert_character_alchemy,
+    on_submit_click, insert_data_alchemy, insert_stat_alchemy, get_stat_by_name_alchemy,
+    update_stat_by_name, get_id, get_item_from_id, show_image, insert_stat_item_relation_alchemy,
+    get_stat_id, get_stats_for_item, upsert_stat_for_item, delete_item_stat_relation,
+    insert_trait_alchemy, get_trait_from_id, get_trait_by_name_alchemy, update_trait_by_name,
+    get_stats_for_trait, delete_trait_stat_relation, upsert_stat_for_trait, get_trait_id, delete_trait_alchemy,
+    )
 import streamlit as st
 import time
 import uuid
@@ -93,6 +95,23 @@ def delete_race():
         delete_data_alchemy('race', st.session_state.delete)
         st.success(f"Race {st.session_state.delete} was successfully removed.")
         st.toast("Race successfully deleted", icon="✅")
+        time.sleep(2)
+        st.experimental_rerun()
+    return
+
+
+def delete_trait():
+    """
+
+    :return:
+    """
+    st.title("Delete Trait")
+    names_from_primary_info = get_values_alchemy('traits', 'trait_name')
+    st.session_state.delete = st.selectbox("Select trait to delete", names_from_primary_info)
+    if st.button('Delete Trait'):
+        delete_trait_alchemy('traits', st.session_state.delete)
+        st.success(f"Trait {st.session_state.delete} was successfully removed.")
+        st.toast("Trait successfully deleted", icon="✅")
         time.sleep(2)
         st.experimental_rerun()
     return
@@ -320,6 +339,7 @@ def insert_trait():
         name = st.text_input('Trait Name')
         description = st.text_input('Description')
         type_in = st.selectbox('Type', options=['numerical', 'functional'])
+        cost = st.number_input('Cost', step = 1)
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
 
@@ -333,7 +353,8 @@ def insert_trait():
                 trait = {
                     'trait_name': name,
                     'description': description,
-                    'type': type_in
+                    'type': type_in,
+                    'cost': cost
                 }
                 insert_trait_alchemy(trait)
                 st.success('Trait added!')
@@ -399,6 +420,7 @@ def update_trait():
         description = st.text_input('Description', from_stats[2])
         new_type = st.selectbox('Type', options=['numerical', 'functional'],
                                 index=0 if from_stats[3] == 'numerical' else 1)
+        cost_ = st.number_input('Cost', value=from_stats[4], step=1)
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
 
@@ -412,7 +434,8 @@ def update_trait():
                 trait = {
                     'trait_name': name,
                     'description': description,
-                    'type': new_type
+                    'type': new_type,
+                    'cost': cost_
                 }
                 update_trait_by_name(from_stats[1], trait)
 
@@ -507,8 +530,18 @@ def edit_trait():
     trait_id = get_trait_id('traits', show_trait)
     trait = get_trait_from_id(trait_id)
     st.subheader(trait[0][0])
-    st.text(trait[0][1])
-    st.text("This trait is "+ trait[0][2])
+    if trait[0][1] == 'functional':
+        text_ = "a functional use."
+        desc_ = "Function: "
+    elif trait[0][1] == 'numerical':
+        text_ = "only numerical use."
+        desc_ = "Description: "
+    else:
+        text_ = "no use."
+        desc_ = "Des: "
+    st.text("This trait has "+ text_)
+    st.text(desc_ + trait[0][2])
+    st.text("Trait costs: " + str(trait[0][3]))
 
     # name = st.text_input('Name', trait[0][0])
     # description = st.text_input('Description', item[0][2])

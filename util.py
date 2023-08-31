@@ -466,6 +466,25 @@ def delete_data_alchemy(table_name, name):
     print(f"Deleted {result.rowcount} rows.")
 
 
+def delete_trait_alchemy(table_name, name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the table
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Build the delete statement based on the "name"
+    stmt = delete(table).where(table.c.trait_name == name)
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    # Optionally, you can check the number of deleted rows:
+    print(f"Deleted {result.rowcount} rows.")
+
+
 def insert_or_increment_character_item(data):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -734,7 +753,7 @@ def get_trait_from_id(traitID):
     table = Table(table_name, metadata, autoload_with=engine)
 
     # Create the select statement to get all itemID and quantity for the specified characterID
-    stmt = select(table.c.trait_name, table.c.type, table.c.description).where(table.c.trait_id == traitID)
+    stmt = select(table.c.trait_name, table.c.type, table.c.description, table.c.cost).where(table.c.trait_id == traitID)
 
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
