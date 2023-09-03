@@ -1,7 +1,7 @@
 from pages import (
     insert_character, insert_class, insert_item, insert_race, delete_character, delete_item, delete_race, \
     delete_class, empty_page, insert_stat, delete_stat, update_stat, edit_item, insert_trait, update_trait, edit_trait,
-    delete_trait,
+    delete_trait, add_trait_to_character, link_stat_trait_to_race,
     )
 import streamlit as st
 
@@ -28,7 +28,9 @@ page_names_to_funcs = {
     "Delete Race": delete_race,
     "Delete Class": delete_class,
     "Delete Stat": delete_stat,
-    "Delete Trait": delete_trait
+    "Delete Trait": delete_trait,
+    "Add/Delete Trait to/from character": add_trait_to_character,
+    "Add/Delete Trait/stat from class": link_stat_trait_to_race
     }
 
 page_name = st.selectbox("Chose what you want to do:", page_names_to_funcs.keys())

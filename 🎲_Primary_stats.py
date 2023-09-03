@@ -52,7 +52,7 @@ def app():
         if not st.session_state.char_fetched:
             character = get_character_by_name_alchemy(st.session_state.key)
             st.session_state.active_char = character
-            print(st.session_state.active_char)
+            # print(st.session_state.active_char)
             st.session_state.char_fetched = True
             st.experimental_rerun()
         else:
@@ -64,6 +64,17 @@ def app():
                 st.experimental_rerun()
             # The user is logged in
             st.title(f"Primary Abilities - {st.session_state['active_char']['name']}")
+            col_hp_belief, col_fill1, col_shield_corruption = st.columns([10,5,10])
+            with col_hp_belief:
+                st.session_state['active_char']['hp'] = st.slider('Hitpoint', min_value=0, max_value=150,
+                                                                  value=st.session_state['active_char']['hp'], step=1)
+                st.session_state['active_char']['belief'] = st.slider('Glauben', min_value=0, max_value=150,
+                                                                  value=st.session_state['active_char']['belief'], step=1)
+            with col_shield_corruption:
+                st.session_state['active_char']['shield'] = st.slider('Schild', min_value=0, max_value=150,
+                                                                  value=st.session_state['active_char']['shield'], step=1)
+                st.session_state['active_char']['corruption'] = st.slider('Korruption', min_value=0, max_value=150,
+                                                                  value=st.session_state['active_char']['corruption'], step=1)
             st.divider()
             c100, c110, c120 = st.columns(3)
             c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12 = st.columns([5, 2, 1, 1, 5, 2, 1, 1, 5, 2, 1, 1])
