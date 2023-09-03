@@ -499,11 +499,11 @@ def edit_item():
 
     st.divider()
     st.session_state.item_stats = get_stats_for_item(item_id)
-    print(st.session_state.item_stats)
+    # print(st.session_state.item_stats)
     c_stat_value, c_button, c_fill = st.columns([5, 2, 25])
-    print("st.session_state.item_stats: ", st.session_state.item_stats)
+    # print("st.session_state.item_stats: ", st.session_state.item_stats)
     for active_stat in st.session_state.item_stats:
-        print('active_stat: ', active_stat)
+        # print('active_stat: ', active_stat)
         with c_stat_value:
             annotated_text(
                 annotation(str(active_stat['value']), active_stat['name'], font_size='25px', padding_top="16px",
@@ -660,7 +660,7 @@ def link_stat_trait_to_race():
     st.session_state.key = st.selectbox("Select Race", names_from_primary_info)
     race_ = get_race_by_name_alchemy(st.session_state.key)
     st.session_state.race_traits = get_traits_for_race(race_['id'])
-    print("char traits " + str(st.session_state.race_traits))
+    # print("char traits " + str(st.session_state.race_traits))
     st.divider()
 
     st.subheader("Traits")
@@ -668,7 +668,7 @@ def link_stat_trait_to_race():
     if st.session_state.race_traits is not None:
         for race_trait in st.session_state.race_traits:
             with c_trait_info:
-                print("race_trait   " + str(race_trait))
+                # print("race_trait   " + str(race_trait))
                 filler = str(race_trait['value'])
                 annotated_text(
                     annotation(str(filler), race_trait['trait_name'], font_size='25px', padding_top="16px",
@@ -726,14 +726,14 @@ def link_stat_trait_to_race():
     # --------------------------------------Stat Input----------------------------------------------
 
     st.session_state.race_stats = get_stats_for_race(race_['id'])
-    print("st.session_state.race_stats   ", str(st.session_state.race_stats))
+    # print("st.session_state.race_stats   ", str(st.session_state.race_stats))
     st.subheader("Stats")
     c_stat_info, c_stat_button_delete, c_stat_fill = st.columns([10, 2, 15])
     if st.session_state.race_stats is not None:
         for race_stat in st.session_state.race_stats:
             with c_stat_info:
-                print("race_stat   ", str(race_stat))
-                print(race_stat)
+                # print("race_stat   ", str(race_stat))
+                # print(race_stat)
                 filler = str(race_stat['value'])
                 annotated_text(
                     annotation(str(filler), race_stat['name'], font_size='25px', padding_top="16px",
@@ -798,7 +798,7 @@ def link_stat_trait_to_class():
     st.session_state.key = st.selectbox("Select Class", names_from_primary_info)
     class_ = get_class_by_name_alchemy(st.session_state.key)
     st.session_state.class_traits = get_traits_for_class(class_['id'])
-    print("char traits " + str(st.session_state.class_traits))
+    # print("char traits " + str(st.session_state.class_traits))
     st.divider()
 
     st.subheader("Traits")
@@ -806,7 +806,7 @@ def link_stat_trait_to_class():
     if st.session_state.class_traits is not None:
         for class_trait in st.session_state.class_traits:
             with c_trait_info:
-                print("race_trait   " + str(class_trait))
+                # print("race_trait   " + str(class_trait))
                 filler = str(class_trait['value'])
                 annotated_text(
                     annotation(str(filler), class_trait['trait_name'], font_size='25px', padding_top="16px",
@@ -863,14 +863,14 @@ def link_stat_trait_to_class():
     st.divider()
     # --------------------------------------Stat Input----------------------------------------------
     st.session_state.class_stats = get_stats_for_class(class_['id'])
-    print("st.session_state.race_stats   ", str(st.session_state.class_stats))
+    # print("st.session_state.race_stats   ", str(st.session_state.class_stats))
     st.subheader("Stats")
     c_stat_info, c_stat_button_delete, c_stat_fill = st.columns([10, 2, 15])
     if st.session_state.class_stats is not None:
         for class_stat in st.session_state.class_stats:
             with c_stat_info:
-                print("race_stat   ", str(class_stat))
-                print(class_stat)
+                # print("race_stat   ", str(class_stat))
+                # print(class_stat)
                 filler = str(class_stat['value'])
                 annotated_text(
                     annotation(str(filler), class_stat['name'], font_size='25px', padding_top="16px",
@@ -935,14 +935,14 @@ def add_trait_to_character():
     st.session_state.key = st.selectbox("Select your character", names_from_primary_info)
     character = get_character_by_name_alchemy(st.session_state.key)
     st.session_state.character_traits = get_traits_for_character(character['id'])
-    print("char traits " + str(st.session_state.character_traits))
+    # print("char traits " + str(st.session_state.character_traits))
     st.divider()
 
     c_trait_info, c_trait_button_delete, c_trait_fill = st.columns([10, 2, 15])
     if st.session_state.character_traits is not None:
         for character_trait in st.session_state.character_traits:
             with c_trait_info:
-                print(character_trait)
+                # print(character_trait)
                 filler = str(character_trait['value'])
                 annotated_text(
                     annotation(str(filler), character_trait['trait_name'], font_size='25px', padding_top="16px",

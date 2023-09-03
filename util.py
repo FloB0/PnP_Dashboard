@@ -88,7 +88,7 @@ def insert_character_alchemy(character):
     existing_columns = set(column.name for column in list(table.columns))
     for column in character.keys():
         if column not in existing_columns:
-            print(f"Column {column} does not exist in table primary_info.")
+            # print(f"Column {column} does not exist in table primary_info.")
             return
 
     # Use SQLAlchemy's insert() to build the insert statement
@@ -110,7 +110,7 @@ def insert_data_alchemy(table_name, data):
     existing_columns = set(column.name for column in list(table.columns))
     for column in data.keys():
         if column not in existing_columns:
-            print(f"Column {column} does not exist in table primary_info.")
+            # print(f"Column {column} does not exist in table primary_info.")
             return
 
     # Use SQLAlchemy's insert() to build the insert statement
@@ -260,7 +260,7 @@ def update_character_alchemy(table_name, character_id, updated_values):
     # Check if table exists in the database
     with engine.connect() as connection:
         if not engine.dialect.has_table(connection, table_name):
-            print(f"Table {table_name} does not exist.")
+            # print(f"Table {table_name} does not exist.")
             return
 
         # Autoload the table structure
@@ -270,7 +270,7 @@ def update_character_alchemy(table_name, character_id, updated_values):
         existing_columns = set(column.name for column in list(table.columns))
         for column_name in updated_values.keys():
             if column_name not in existing_columns:
-                print(f"Column {column_name} does not exist in table {table_name}.")
+                # print(f"Column {column_name} does not exist in table {table_name}.")
                 return
 
         # Check if record exists
@@ -293,7 +293,7 @@ def update_character_alchemy_updated(table_name, character_id, updated_values):
     # Use inspect to check if table exists
     inspector = inspect(engine)
     if not inspector.has_table(table_name):
-        print(f"Table {table_name} does not exist.")
+        # print(f"Table {table_name} does not exist.")
         return False
 
     table = Table(table_name, metadata, autoload_with=engine)
@@ -301,7 +301,7 @@ def update_character_alchemy_updated(table_name, character_id, updated_values):
     existing_columns = set(column.name for column in list(table.columns))
     for column_name in updated_values.keys():
         if column_name not in existing_columns:
-            print(f"Column {column_name} does not exist in table {table_name}.")
+            # print(f"Column {column_name} does not exist in table {table_name}.")
             return False
 
     try:
@@ -319,13 +319,13 @@ def update_character_alchemy_updated(table_name, character_id, updated_values):
                 connection.commit()
                 return True
             else:
-                print(f"Record with id {character_id} not found. No update performed.")
+                # print(f"Record with id {character_id} not found. No update performed.")
                 return False
 
             connection.commit()
             return True
     except SQLAlchemyError as e:
-        print(f"Database error: {e}")
+        # print(f"Database error: {e}")
         return False
 
 
@@ -336,7 +336,7 @@ def update_character_by_name(table_name, character_name, updated_values):
     # Use inspect to check if table exists
     inspector = inspect(engine)
     if not inspector.has_table(table_name):
-        print(f"Table {table_name} does not exist.")
+        # print(f"Table {table_name} does not exist.")
         return False
 
     table = Table(table_name, metadata, autoload_with=engine)
@@ -344,7 +344,7 @@ def update_character_by_name(table_name, character_name, updated_values):
     existing_columns = set(column.name for column in list(table.columns))
     for column_name in updated_values.keys():
         if column_name not in existing_columns:
-            print(f"Column {column_name} does not exist in table {table_name}.")
+            # print(f"Column {column_name} does not exist in table {table_name}.")
             return False
 
     try:
@@ -363,10 +363,10 @@ def update_character_by_name(table_name, character_name, updated_values):
                 connection.commit()
                 return True
             else:
-                print(f"Record with name {character_name} not found. No update performed.")
+                # print(f"Record with name {character_name} not found. No update performed.")
                 return False
     except SQLAlchemyError as e:
-        print(f"Database error: {e}")
+        # print(f"Database error: {e}")
         return False
 
 
@@ -415,7 +415,7 @@ def update_secondary_alchemy(id, by_session_state):
             'handwerk': handwerk,
             'steuerung': steuerung
         }
-        print(updated_values)
+        # print(updated_values)
     else:
         nahkampf = st.session_state.character['kk'] * 2 + st.session_state.character['p'] + st.session_state.character[
             'nahkampf']
@@ -479,7 +479,7 @@ def update_secondary_alchemy(id, by_session_state):
             'handwerk': handwerk,
             'steuerung': steuerung
         }
-        print(updated_values)
+        # print(updated_values)
 
     # here this will end in a endless loop -> variables need in a new table
     update_character_alchemy('secondary_info', id, updated_values)
@@ -509,7 +509,7 @@ def delete_character_alchemy(name):
         connection.commit()
 
     # Optionally, you can check the number of deleted rows:
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
     del st.session_state['active_char']
 
 
@@ -529,7 +529,7 @@ def delete_data_alchemy(table_name, name):
         connection.commit()
 
     # Optionally, you can check the number of deleted rows:
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
 
 
 def delete_trait_alchemy(table_name, name):
@@ -548,7 +548,7 @@ def delete_trait_alchemy(table_name, name):
         connection.commit()
 
     # Optionally, you can check the number of deleted rows:
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
 
 
 def insert_or_increment_character_item(data):
@@ -563,7 +563,7 @@ def insert_or_increment_character_item(data):
     existing_columns = set(column.name for column in list(table.columns))
     for column in data.keys():
         if column not in existing_columns:
-            print(f"Column {column} does not exist in table {table_name}.")
+            # print(f"Column {column} does not exist in table {table_name}.")
             return
 
     # Manually constructing the SQL statement
@@ -593,7 +593,7 @@ def get_id(table_name, name):
         if result:
             return result[0]
         else:
-            print(f"No ItemID found for item name: {name}")
+            # print(f"No ItemID found for item name: {name}")
             return None
 
 
@@ -612,7 +612,7 @@ def get_stat_id(table_name, name):
         if result:
             return result[0]
         else:
-            print(f"No ItemID found for item name: {name}")
+            # print(f"No ItemID found for item name: {name}")
             return None
 
 
@@ -631,7 +631,7 @@ def get_trait_id(table_name, name):
         if result:
             return result[0]
         else:
-            print(f"No ItemID found for item name: {name}")
+            # print(f"No ItemID found for item name: {name}")
             return None
 
 
@@ -650,7 +650,7 @@ def get_trait_id(table_name, name):
         if result:
             return result[0]
         else:
-            print(f"No ItemID found for item name: {name}")
+            # print(f"No ItemID found for item name: {name}")
             return None
 
 
@@ -738,7 +738,7 @@ def decrement_or_delete_character_item(data):
     existing_columns = set(column.name for column in list(table.columns))
     for column in data.keys():
         if column not in existing_columns:
-            print(f"Column {column} does not exist in table {table_name}.")
+            # print(f"Column {column} does not exist in table {table_name}.")
             return
 
     # Decrement the quantity by 1, and if the quantity becomes zero, delete the row
@@ -801,7 +801,7 @@ def get_items_for_character(characterID):
             items_dict = {row[0]: row[1] for row in results}
             return items_dict
         else:
-            print(f"No items found for characterID: {characterID}")
+            # print(f"No items found for characterID: {characterID}")
             return {}
 
 
@@ -825,7 +825,7 @@ def get_item_from_id(itemID):
             items_dict = results
             return items_dict
         else:
-            print(f"No items found for characterID: {itemID}")
+            # print(f"No items found for characterID: {itemID}")
             return {}
 
 
@@ -849,7 +849,7 @@ def get_trait_from_id(traitID):
             trait_dict = results
             return trait_dict
         else:
-            print(f"No items found for characterID: {traitID}")
+            # print(f"No items found for characterID: {traitID}")
             return {}
 
 
@@ -860,7 +860,7 @@ def get_layout_character_item(character_id):
     layout_x = 0
     layout_y = 0
     for key in items_from_character:
-        print("X: ", layout_x, " Y: ", layout_y)
+        # print("X: ", layout_x, " Y: ", layout_y)
         quantity_iterator = 0
         while quantity_iterator < items_from_character[key]:
             dashboard_item = dashboard.Item(str(layout_iterator), layout_x, layout_y, 3, 4)
@@ -879,7 +879,7 @@ def get_layout_character_item(character_id):
 
 def create_item_elements_for_character_id(characterID):
     layout = get_layout_character_item(characterID)
-    print(layout)
+    # print(layout)
     items = get_items_for_character(characterID)
     item_counter = 0
     with elements("Dashboard Items"):
@@ -887,7 +887,7 @@ def create_item_elements_for_character_id(characterID):
             for key in items:
                 quantity_iterator = 0
                 while quantity_iterator < items[key]:
-                    print('layout:', layout[item_counter]['i'])
+                    # print('layout:', layout[item_counter]['i'])
                     item_list = get_item_from_id(key)
                     # print(item_list)
                     with mui.Card(key=str(item_counter), sx={"display": "flex", "flexDirection": "column"}):
@@ -952,7 +952,7 @@ def insert_stat_alchemy(stat_data):
     existing_columns = set(column.name for column in list(table.columns))
     for column in stat_data.keys():
         if column not in existing_columns:
-            print(f"Column {column} does not exist in table stats.")
+            # print(f"Column {column} does not exist in table stats.")
             return
 
     # Use SQLAlchemy's insert() to build the insert statement
@@ -974,7 +974,7 @@ def insert_trait_alchemy(trait_data):
     existing_columns = set(column.name for column in list(table.columns))
     for column in trait_data.keys():
         if column not in existing_columns:
-            print(f"Column {column} does not exist in table stats.")
+            # print(f"Column {column} does not exist in table stats.")
             return
 
     # Use SQLAlchemy's insert() to build the insert statement
@@ -996,7 +996,7 @@ def insert_stat_item_relation_alchemy(relation_data):
     existing_columns = set(column.name for column in list(table.columns))
     for column in relation_data.keys():
         if column not in existing_columns:
-            print(f"Column {column} does not exist in table item_stats.")
+            # print(f"Column {column} does not exist in table item_stats.")
             return
 
     # Use SQLAlchemy's insert() to build the insert statement
@@ -1333,7 +1333,7 @@ def delete_item_stat_relation(item_id, stat_id):
         result = connection.execute(stmt)
         connection.commit()
 
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
 
 
 def delete_trait_stat_relation(trait_id, stat_id):
@@ -1353,7 +1353,7 @@ def delete_trait_stat_relation(trait_id, stat_id):
         result = connection.execute(stmt)
         connection.commit()
 
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
 
 
 def delete_trait_character_relation(trait_id, character_id):
@@ -1373,7 +1373,7 @@ def delete_trait_character_relation(trait_id, character_id):
         result = connection.execute(stmt)
         connection.commit()
 
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
 
 
 def delete_trait_race_relation(trait_id, race_id):
@@ -1393,7 +1393,7 @@ def delete_trait_race_relation(trait_id, race_id):
         result = connection.execute(stmt)
         connection.commit()
 
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
 
 
 def delete_trait_class_relation(trait_id, class_id):
@@ -1413,7 +1413,7 @@ def delete_trait_class_relation(trait_id, class_id):
         result = connection.execute(stmt)
         connection.commit()
 
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
 
 
 def delete_stat_race_relation(stat_id, race_id):
@@ -1433,7 +1433,7 @@ def delete_stat_race_relation(stat_id, race_id):
         result = connection.execute(stmt)
         connection.commit()
 
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
 
 
 def delete_stat_class_relation(stat_id, class_id):
@@ -1453,7 +1453,7 @@ def delete_stat_class_relation(stat_id, class_id):
         result = connection.execute(stmt)
         connection.commit()
 
-    print(f"Deleted {result.rowcount} rows.")
+    # print(f"Deleted {result.rowcount} rows.")
 
 
 def get_traits_for_character(character_id):
@@ -1474,7 +1474,7 @@ def get_traits_for_character(character_id):
     # Execute the statement and fetch results
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
-    print("results " + str(results))
+    # print("results " + str(results))
     # Convert results to a list of dictionaries
     column_names = ["id", "trait_name", "description", "trait_type", "cost", "category", "value"]
     traits_list = [dict(zip(column_names, row)) for row in results]
@@ -1500,7 +1500,7 @@ def get_traits_for_race(race_id):
     # Execute the statement and fetch results
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
-    print("results " + str(results))
+    # print("results " + str(results))
     # Convert results to a list of dictionaries
     column_names = ["id", "trait_name", "description", "trait_type", "cost", "category", "value"]
     traits_list = [dict(zip(column_names, row)) for row in results]
@@ -1526,7 +1526,7 @@ def get_traits_for_class(class_id):
     # Execute the statement and fetch results
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
-    print("results " + str(results))
+    # print("results " + str(results))
     # Convert results to a list of dictionaries
     column_names = ["id", "trait_name", "description", "trait_type", "cost", "category", "value"]
     traits_list = [dict(zip(column_names, row)) for row in results]
@@ -1551,7 +1551,7 @@ def get_stats_for_race(race_id):
     # Execute the statement and fetch results
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
-    print("results " + str(results))
+    # print("results " + str(results))
     # Convert results to a list of dictionaries
     stats_data = [{"stat_id": row[0], "name": row[1], "description": row[2], "type": row[3], "value": row[4]} for row in results]
 
@@ -1576,7 +1576,7 @@ def get_stats_for_class(class_id):
     # Execute the statement and fetch results
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
-    print("results " + str(results))
+    # print("results " + str(results))
     # Convert results to a list of dictionaries
     stats_data = [{"stat_id": row[0], "name": row[1], "description": row[2], "type": row[3], "value": row[4]} for row in results]
 
