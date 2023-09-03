@@ -67,7 +67,7 @@ def fetch_all_from_table(table_name):
     # Execute the statement and fetch all results
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
-    print(results)
+    # print(results)
 
     # Convert results to a list of dictionaries
     rows = [row._asdict() for row in results]

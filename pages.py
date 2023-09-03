@@ -416,52 +416,65 @@ def update_trait():
     """
     st.title("Update trait")
     names_from_stat = fetch_all_from_table('traits')
-    traits_list = [d['trait_name'] for d in names_from_stat]
-    print(names_from_stat)
-    update_value = st.selectbox("Select trait to update", traits_list)
+    desired_categories = ['character', 'item', 'race', 'class']
+    c_trait_select , c_cat_filter = st.columns([15,5])
+
+    with c_cat_filter:
+        filtered_cat = st.multiselect('Category', options=['All', 'character', 'item', 'race', 'class'],
+                                                     default='All')
+        if 'All' in filtered_cat:
+            desired_categories_ = desired_categories
+        else:
+            desired_categories_ = filtered_cat
+        filtered_list = [d for d in names_from_stat if d['category'] in desired_categories_]
+        traits_list = [d['trait_name'] for d in filtered_list]
+    with c_trait_select:
+        update_value = st.selectbox("Select trait to update", traits_list)
     from_stats = get_trait_by_name_alchemy(update_value)
-    with st.form(key='trait_form', clear_on_submit=True):
-        name = st.text_input('Name', from_stats[1])
-        description = st.text_input('Description', from_stats[2])
-        new_type = st.selectbox('Type', options=['numerical', 'functional'],
-                                index=0 if from_stats[3] == 'numerical' else 1)
-        cost_ = st.number_input('Cost', value=from_stats[4], step=1)
-        print(from_stats[5])
-        if from_stats[5] == 'character':
-            index = 0
-        elif from_stats[5] == 'item':
-            index = 1
-        elif from_stats[5] == 'race':
-            index = 2
-        elif from_stats[5] == 'class':
-            index = 3
-        new_cat = st.selectbox('Type', options=['character', 'item', 'race', 'class'], index=index)
+    if from_stats == None:
+        st.write("Select Trait to update..")
+    else:
+        with st.form(key='trait_form', clear_on_submit=True):
+            name = st.text_input('Name', from_stats[1])
+            description = st.text_input('Description', from_stats[2])
+            new_type = st.selectbox('Type', options=['numerical', 'functional'],
+                                    index=0 if from_stats[3] == 'numerical' else 1)
+            cost_ = st.number_input('Cost', value=from_stats[4], step=1)
+            if from_stats[5] == 'character':
+                index = 0
+            elif from_stats[5] == 'item':
+                index = 1
+            elif from_stats[5] == 'race':
+                index = 2
+            elif from_stats[5] == 'class':
+                index = 3
+            new_cat = st.selectbox('Type', options=['character', 'item', 'race', 'class'], index=index)
 
-        # Create the submit button
-        st.form_submit_button("Submit", on_click=on_submit_click)
+            # Create the submit button
+            st.form_submit_button("Submit", on_click=on_submit_click)
 
-        # If the submit button is clicked, insert the new character into the SQLite database
-        if st.session_state.get('submitted', False):
-            if name == '':
-                st.warning('Please enter a name before submitting.')
-            elif name in get_values_alchemy('traits', 'trait_name') and update_value != name:
-                st.warning('Name already taken. Please try something else')
-            else:
-                trait = {
-                    'trait_name': name,
-                    'description': description,
-                    'type': new_type,
-                    'cost': cost_,
-                    'category': new_cat
-                    }
-                update_trait_by_name(from_stats[1], trait)
+            # If the submit button is clicked, insert the new character into the SQLite database
+            if st.session_state.get('submitted', False):
+                if name == '':
+                    st.warning('Please enter a name before submitting.')
+                elif name in get_values_alchemy('traits', 'trait_name') and update_value != name:
+                    st.warning('Name already taken. Please try something else')
+                else:
+                    trait = {
+                        'trait_name': name,
+                        'description': description,
+                        'type': new_type,
+                        'cost': cost_,
+                        'category': new_cat
+                        }
+                    update_trait_by_name(from_stats[1], trait)
 
-                st.success('Trait updated!')
-                st.session_state.submitted = False
-                st.session_state.show_form = False
-                st.toast("Trait updated!", icon="✅")
-                time.sleep(2)
-                st.experimental_rerun()
+                    st.success('Trait updated!')
+                    st.session_state.submitted = False
+                    st.session_state.show_form = False
+                    st.toast("Trait updated!", icon="✅")
+                    time.sleep(2)
+                    st.experimental_rerun()
     return
 
 
@@ -542,95 +555,95 @@ def edit_item():
 
 def edit_trait():
     st.title("Edit Trait")
-    trait_from_dropdown = get_values_alchemy('traits', 'trait_name')
-    show_trait = st.selectbox("Select trait to edit", trait_from_dropdown)
-    trait_id = get_trait_id('traits', show_trait)
+    trait_from_dropdown = fetch_all_from_table('traits')
+    desired_categories = ['character', 'item', 'race', 'class']
+    c_trait_select, c_cat_filter = st.columns([15, 5])
+
+    with c_cat_filter:
+        filtered_cat = st.multiselect('Category', options=['All', 'character', 'item', 'race', 'class'],
+                                      default='All')
+        if 'All' in filtered_cat:
+            desired_categories_ = desired_categories
+        else:
+            desired_categories_ = filtered_cat
+        filtered_list = [d for d in trait_from_dropdown if d['category'] in desired_categories_]
+        traits_list = [d['trait_name'] for d in filtered_list]
+    with c_trait_select:
+        update_value = st.selectbox("Select trait to update", traits_list)
+    trait_id = get_trait_id('traits', update_value)
     trait = get_trait_from_id(trait_id)
-    st.subheader(trait[0][0])
-    if trait[0][1] == 'functional':
-        text_ = "a functional use."
-        desc_ = "Function: "
-    elif trait[0][1] == 'numerical':
-        text_ = "only numerical use."
-        desc_ = "Description: "
+    if trait == {}:
+        st.write("Select Trait to edit..")
     else:
-        text_ = "no use."
-        desc_ = "Des: "
-    st.text("This trait has "+ text_)
-    st.text(desc_ + trait[0][2])
-    st.text("Trait costs: " + str(trait[0][3]))
+        st.subheader(trait[0][0])
+        if trait[0][1] == 'functional':
+            text_ = "a functional use."
+            desc_ = "Function: "
+        elif trait[0][1] == 'numerical':
+            text_ = "only numerical use."
+            desc_ = "Description: "
+        else:
+            text_ = "no use."
+            desc_ = "Des: "
+        st.text("This trait has "+ text_)
+        st.text(desc_ + trait[0][2])
+        st.text("Trait costs: " + str(trait[0][3]))
 
-    # name = st.text_input('Name', trait[0][0])
-    # description = st.text_input('Description', item[0][2])
-    # type = st.selectbox('Type', options=['numerical', 'functional'], )
+        st.divider()
+        st.session_state.trait_stats = get_stats_for_trait(trait_id)
+        c_trait_value, c_trait_button, c_trait_fill = st.columns([5,2,25])
+        for active_trait in st.session_state.trait_stats:
+            with c_trait_value:
+                filler = active_trait['value']
+                annotated_text(
+                    annotation(str(filler), active_trait['name'], font_size='25px', padding_top="16px", padding_bottom="16px")
+                    )
+            with c_trait_button:
+                st.markdown(
+                    """
+                <style>
+                button {
+                    height: 5px;
+                    padding-top: 5px !important;
+                    padding-bottom: 5px !important;
+                    padding-right: 5px !important;
+                    padding-left: 5px !important;
+                }
+                </style>
+                """,
+                    unsafe_allow_html=True,
+                )
+                # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
+                # print(uni_key)
+                # print(f"Before button creation with key: {uni_key}")
+                st.button(":wastebasket:", type="secondary", key=active_trait['name'], on_click=delete_trait_stat_relation, args=(trait_id,
+                                                                                                         active_trait['stat_id']))
+                # print(f"After button creation with key: {uni_key}")
+            with c_trait_fill:
+                st.text("")
+        st.divider()
+        col_trait, col_trait_value, col_trait_button = st.columns(3)
+        stat_names = get_values_alchemy('stats', 'name')
+        with col_trait:
+            in_stat_name = st.selectbox("Trait", stat_names)
+            stat_id = get_stat_id('stats', in_stat_name)
+        with col_trait_value:
+            in_value = st.number_input("Value", step=1)
 
-    # # st.button("Show picture..")
-    # if 'show_image' in st.session_state:
-    #     st.image(st.session_state.show_image)
-    # description = st.text_input('Description', item[0][2])
-
-    st.divider()
-    st.session_state.trait_stats = get_stats_for_trait(trait_id)
-    print(st.session_state.trait_stats)
-    c_trait_value, c_trait_button, c_trait_fill = st.columns([5,2,25])
-    print("st.session_state.trait_stats: ", st.session_state.trait_stats)
-    for active_trait in st.session_state.trait_stats:
-        print('active_stat: ', active_trait)
-        with c_trait_value:
-            # if active_trait['type'] == 'numerical':
-            #     filler = active_trait['value']
-            # elif active_trait['type'] == 'functional':
-            #     filler = active_trait['description']
-            filler = active_trait['value']
-            annotated_text(
-                annotation(str(filler), active_trait['name'], font_size='25px', padding_top="16px", padding_bottom="16px")
-            )
-        with c_trait_button:
-            st.markdown(
-                """
+        with col_trait_button:
+            st.markdown("""
             <style>
-            button {
-                height: 5px;
-                padding-top: 5px !important;
-                padding-bottom: 5px !important;
-                padding-right: 5px !important;
-                padding-left: 5px !important;
+            .blocker {
+                font-size:0px;
+                opacity:0;
             }
             </style>
-            """,
-                unsafe_allow_html=True,
-            )
-            # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
-            # print(uni_key)
-            # print(f"Before button creation with key: {uni_key}")
-            st.button(":wastebasket:", type="secondary", key=active_trait['name'], on_click=delete_trait_stat_relation, args=(trait_id,
-                                                                                                     active_trait['stat_id']))
-            # print(f"After button creation with key: {uni_key}")
-        with c_trait_fill:
-            st.text("")
-    st.divider()
-    col_trait, col_trait_value, col_trait_button = st.columns(3)
-    stat_names = get_values_alchemy('stats', 'name')
-    with col_trait:
-        in_stat_name = st.selectbox("Trait", stat_names)
-        stat_id = get_stat_id('stats', in_stat_name)
-    with col_trait_value:
-        in_value = st.number_input("Value", step=1)
+            """, unsafe_allow_html=True)
 
-    with col_trait_button:
-        st.markdown("""
-        <style>
-        .blocker {
-            font-size:0px;
-            opacity:0;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-
-        st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
-        st.button(":heavy_plus_sign:", type="primary", on_click=upsert_stat_for_trait, args=(
-            {'trait_id': trait_id, 'stat_id': stat_id, 'value': in_value},), key="add_trait_button"
-                  )
+            st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
+            st.button(":heavy_plus_sign:", type="primary", on_click=upsert_stat_for_trait, args=(
+                {'trait_id': trait_id, 'stat_id': stat_id, 'value': in_value},), key="add_trait_button"
+                      )
     return
 
 
