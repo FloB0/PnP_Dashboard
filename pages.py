@@ -9,7 +9,9 @@ from util import (
     get_stats_for_trait, delete_trait_stat_relation, upsert_stat_for_trait, get_trait_id, delete_trait_alchemy,
     fetch_all_from_table, get_character_by_name_alchemy, get_traits_for_character, delete_trait_character_relation,
     upsert_trait_for_character, get_trait_id, get_race_by_name_alchemy, get_traits_for_race, delete_trait_race_relation,
-    upsert_trait_for_race,
+    upsert_trait_for_race, get_stats_for_race, delete_stat_race_relation, upsert_stat_for_race,
+    get_class_by_name_alchemy, delete_trait_class_relation, get_traits_for_class, upsert_trait_for_class,
+    get_stats_for_class, upsert_stat_for_class, delete_stat_class_relation
     )
 import streamlit as st
 import time
@@ -189,7 +191,7 @@ def insert_character():
                     'g': g,
                     'wi': wi,
                     'c': c
-                }
+                    }
                 insert_character_alchemy(character)
                 st.success('Character created successfully!')
                 st.session_state.submitted = False
@@ -220,7 +222,7 @@ def insert_class():
             else:
                 classes = {
                     'name': name,
-                }
+                    }
                 insert_data_alchemy('classes', classes)
                 st.success('Class created successfully!')
                 st.session_state.submitted = False
@@ -255,7 +257,7 @@ def insert_item():
                     'name': name,
                     'description': description,
                     'image_url': image_url
-                }
+                    }
                 insert_data_alchemy('items', items)
                 st.success('Item created successfully!')
                 st.session_state.submitted = False
@@ -286,7 +288,7 @@ def insert_race():
             else:
                 race = {
                     'name': name,
-                }
+                    }
                 insert_data_alchemy('race', race)
                 st.success('Race created successfully!')
                 st.session_state.submitted = False
@@ -321,7 +323,7 @@ def insert_stat():
                     'name': name,
                     'description': description,
                     'type': type_in
-                }
+                    }
                 insert_stat_alchemy(stats)
                 st.success('Stat added!')
                 st.session_state.submitted = False
@@ -342,7 +344,7 @@ def insert_trait():
         name = st.text_input('Trait Name')
         description = st.text_input('Description')
         type_in = st.selectbox('Type', options=['numerical', 'functional'])
-        cost = st.number_input('Cost', step = 1)
+        cost = st.number_input('Cost', step=1)
         category = st.selectbox('Type', options=['character', 'item', 'race', 'class'], index='character')
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
@@ -399,7 +401,7 @@ def update_stat():
                     'name': name,
                     'description': description,
                     'type': new_type
-                }
+                    }
                 update_stat_by_name(from_stats[1], stats)
 
                 st.success('Stat updated!')
@@ -419,11 +421,11 @@ def update_trait():
     st.title("Update trait")
     names_from_stat = fetch_all_from_table('traits')
     desired_categories = ['character', 'item', 'race', 'class']
-    c_trait_select , c_cat_filter = st.columns([15,5])
+    c_trait_select, c_cat_filter = st.columns([15, 5])
 
     with c_cat_filter:
         filtered_cat = st.multiselect('Category', options=['All', 'character', 'item', 'race', 'class'],
-                                                     default='All')
+                                      default='All')
         if 'All' in filtered_cat:
             desired_categories_ = desired_categories
         else:
@@ -498,14 +500,15 @@ def edit_item():
     st.divider()
     st.session_state.item_stats = get_stats_for_item(item_id)
     print(st.session_state.item_stats)
-    c_stat_value, c_button, c_fill = st.columns([5,2,25])
+    c_stat_value, c_button, c_fill = st.columns([5, 2, 25])
     print("st.session_state.item_stats: ", st.session_state.item_stats)
     for active_stat in st.session_state.item_stats:
         print('active_stat: ', active_stat)
         with c_stat_value:
             annotated_text(
-                annotation(str(active_stat['value']), active_stat['name'], font_size='25px', padding_top="16px", padding_bottom="16px")
-            )
+                annotation(str(active_stat['value']), active_stat['name'], font_size='25px', padding_top="16px",
+                           padding_bottom="16px")
+                )
         with c_button:
             st.markdown(
                 """
@@ -520,12 +523,13 @@ def edit_item():
             </style>
             """,
                 unsafe_allow_html=True,
-            )
+                )
             # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
             # print(uni_key)
             # print(f"Before button creation with key: {uni_key}")
-            st.button(":wastebasket:", type="secondary", key=active_stat['name'], on_click=delete_item_stat_relation, args=(item_id,
-                                                                                                     active_stat['stat_id']))
+            st.button(":wastebasket:", type="secondary", key=active_stat['name'], on_click=delete_item_stat_relation,
+                      args=(item_id,
+                            active_stat['stat_id']))
             # print(f"After button creation with key: {uni_key}")
         with c_fill:
             st.text("")
@@ -587,18 +591,19 @@ def edit_trait():
         else:
             text_ = "no use."
             desc_ = "Des: "
-        st.text("This trait has "+ text_)
+        st.text("This trait has " + text_)
         st.text(desc_ + trait[0][2])
         st.text("Trait costs: " + str(trait[0][3]))
 
         st.divider()
         st.session_state.trait_stats = get_stats_for_trait(trait_id)
-        c_trait_value, c_trait_button, c_trait_fill = st.columns([5,2,25])
+        c_trait_value, c_trait_button, c_trait_fill = st.columns([5, 2, 25])
         for active_trait in st.session_state.trait_stats:
             with c_trait_value:
                 filler = active_trait['value']
                 annotated_text(
-                    annotation(str(filler), active_trait['name'], font_size='25px', padding_top="16px", padding_bottom="16px")
+                    annotation(str(filler), active_trait['name'], font_size='25px', padding_top="16px",
+                               padding_bottom="16px")
                     )
             with c_trait_button:
                 st.markdown(
@@ -614,12 +619,13 @@ def edit_trait():
                 </style>
                 """,
                     unsafe_allow_html=True,
-                )
+                    )
                 # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
                 # print(uni_key)
                 # print(f"Before button creation with key: {uni_key}")
-                st.button(":wastebasket:", type="secondary", key=active_trait['name'], on_click=delete_trait_stat_relation, args=(trait_id,
-                                                                                                         active_trait['stat_id']))
+                st.button(":wastebasket:", type="secondary", key=active_trait['name'],
+                          on_click=delete_trait_stat_relation, args=(trait_id,
+                                                                     active_trait['stat_id']))
                 # print(f"After button creation with key: {uni_key}")
             with c_trait_fill:
                 st.text("")
@@ -657,11 +663,12 @@ def link_stat_trait_to_race():
     print("char traits " + str(st.session_state.race_traits))
     st.divider()
 
+    st.subheader("Traits")
     c_trait_info, c_trait_button_delete, c_trait_fill = st.columns([10, 2, 15])
     if st.session_state.race_traits is not None:
         for race_trait in st.session_state.race_traits:
             with c_trait_info:
-                print(race_trait)
+                print("race_trait   " + str(race_trait))
                 filler = str(race_trait['value'])
                 annotated_text(
                     annotation(str(filler), race_trait['trait_name'], font_size='25px', padding_top="16px",
@@ -692,48 +699,117 @@ def link_stat_trait_to_race():
                 # print(f"After button creation with key: {uni_key}")
             with c_trait_fill:
                 st.text("")
-    st.divider()
+    # --------------------------------------Stat Input----------------------------------------------
     col_trait, col_trait_value, col_trait_button = st.columns(3)
     trait_names = get_values_alchemy('traits', 'trait_name')
     with col_trait:
         in_trait_name = st.selectbox("Trait", trait_names)
         trait_id = get_trait_id('traits', in_trait_name)
     with col_trait_value:
-        in_value = st.number_input("Value", step=1)
+        in_value = st.number_input("Value", step=1, key=in_trait_name+"-1")
 
     with col_trait_button:
         st.markdown("""
-            <style>
-            .blocker {
-                font-size:0px;
-                opacity:0;
-            }
-            </style>
-            """, unsafe_allow_html=True)
+                <style>
+                .blocker {
+                    font-size:0px;
+                    opacity:0;
+                }
+                </style>
+                """, unsafe_allow_html=True)
 
         st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
         st.button(":heavy_plus_sign:", type="primary", on_click=upsert_trait_for_race, args=(
-            {'trait_id': trait_id, 'race_id': race_['id'], 'value': in_value},), key="add_trait_button"
+            {'trait_id': trait_id, 'race_id': race_['id'], 'value': in_value},), key=uuid.uuid4()
                   )
+    st.divider()
+    # --------------------------------------Stat Input----------------------------------------------
+
+    st.session_state.race_stats = get_stats_for_race(race_['id'])
+    print("st.session_state.race_stats   ", str(st.session_state.race_stats))
+    st.subheader("Stats")
+    c_stat_info, c_stat_button_delete, c_stat_fill = st.columns([10, 2, 15])
+    if st.session_state.race_stats is not None:
+        for race_stat in st.session_state.race_stats:
+            with c_stat_info:
+                print("race_stat   ", str(race_stat))
+                print(race_stat)
+                filler = str(race_stat['value'])
+                annotated_text(
+                    annotation(str(filler), race_stat['name'], font_size='25px', padding_top="16px",
+                               padding_bottom="16px")
+                    )
+            with c_stat_button_delete:
+                st.markdown(
+                    """
+                <style>
+                button {
+                    height: 5px;
+                    padding-top: 5px !important;
+                    padding-bottom: 5px !important;
+                    padding-right: 5px !important;
+                    padding-left: 5px !important;
+                }
+                </style>
+                """,
+                    unsafe_allow_html=True,
+                    )
+                # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
+                # print(uni_key)
+                # print(f"Before button creation with key: {uni_key}")
+                st.button(":wastebasket:", type="secondary", key=race_stat['name'],
+                          on_click=delete_stat_race_relation,
+                          args=(race_stat['stat_id'],
+                                race_['id']))
+                # print(f"After button creation with key: {uni_key}")
+            with c_stat_fill:
+                st.text("")
+
+    # --------------------------------------Trait Input----------------------------------------------
+    col_trait, col_trait_value, col_trait_button = st.columns(3)
+    stat_names = get_values_alchemy('stats', 'name')
+    with col_trait:
+        in_stat_name = st.selectbox("Stat", stat_names)
+        stat_id = get_stat_id('stats', in_stat_name)
+    with col_trait_value:
+        in_value = st.number_input("Value", step=1, key=in_stat_name+"-1")
+
+    with col_trait_button:
+        st.markdown("""
+                <style>
+                .blocker {
+                    font-size:0px;
+                    opacity:0;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
+        st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
+        st.button(":heavy_plus_sign:", type="primary", on_click=upsert_stat_for_race, args=(
+            {'stat_id': stat_id, 'race_id': race_['id'], 'value': in_value},), key="add_trait_button"
+                  )
+    st.divider()
+    # --------------------------------------Trait Input----------------------------------------------
     return
 
 
-def add_trait_to_character():
-    names_from_primary_info = get_values_alchemy('primary_info', 'name')
-    st.session_state.key = st.selectbox("Select your character", names_from_primary_info)
-    character = get_character_by_name_alchemy(st.session_state.key)
-    st.session_state.character_traits = get_traits_for_character(character['id'])
-    print("char traits " + str(st.session_state.character_traits))
+def link_stat_trait_to_class():
+    names_from_primary_info = get_values_alchemy('classes', 'name')
+    st.session_state.key = st.selectbox("Select Class", names_from_primary_info)
+    class_ = get_class_by_name_alchemy(st.session_state.key)
+    st.session_state.class_traits = get_traits_for_class(class_['id'])
+    print("char traits " + str(st.session_state.class_traits))
     st.divider()
 
+    st.subheader("Traits")
     c_trait_info, c_trait_button_delete, c_trait_fill = st.columns([10, 2, 15])
-    if st.session_state.character_traits is not None:
-        for character_trait in st.session_state.character_traits:
+    if st.session_state.class_traits is not None:
+        for class_trait in st.session_state.class_traits:
             with c_trait_info:
-                print(character_trait)
-                filler = str(character_trait['value'])
+                print("race_trait   " + str(class_trait))
+                filler = str(class_trait['value'])
                 annotated_text(
-                    annotation(str(filler), character_trait['trait_name'] , font_size='25px', padding_top="16px",
+                    annotation(str(filler), class_trait['trait_name'], font_size='25px', padding_top="16px",
                                padding_bottom="16px")
                     )
             with c_trait_button_delete:
@@ -754,7 +830,144 @@ def add_trait_to_character():
                 # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
                 # print(uni_key)
                 # print(f"Before button creation with key: {uni_key}")
-                st.button(":wastebasket:", type="secondary", key=character_trait['trait_name'], on_click=delete_trait_character_relation,
+                st.button(":wastebasket:", type="secondary", key=class_trait['trait_name'],
+                          on_click=delete_trait_class_relation,
+                          args=(class_trait['id'],
+                                class_['id']))
+                # print(f"After button creation with key: {uni_key}")
+            with c_trait_fill:
+                st.text("")
+    # --------------------------------------Stat Input----------------------------------------------
+    col_trait, col_trait_value, col_trait_button = st.columns(3)
+    trait_names = get_values_alchemy('traits', 'trait_name')
+    with col_trait:
+        in_trait_name = st.selectbox("Trait", trait_names)
+        trait_id = get_trait_id('traits', in_trait_name)
+    with col_trait_value:
+        in_value = st.number_input("Value", step=1, key=in_trait_name+"-2")
+
+    with col_trait_button:
+        st.markdown("""
+                <style>
+                .blocker {
+                    font-size:0px;
+                    opacity:0;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
+        st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
+        st.button(":heavy_plus_sign:", type="primary", on_click=upsert_trait_for_class, args=(
+            {'trait_id': trait_id, 'class_id': class_['id'], 'value': in_value},), key=uuid.uuid4()
+                  )
+    st.divider()
+    # --------------------------------------Stat Input----------------------------------------------
+    st.session_state.class_stats = get_stats_for_class(class_['id'])
+    print("st.session_state.race_stats   ", str(st.session_state.class_stats))
+    st.subheader("Stats")
+    c_stat_info, c_stat_button_delete, c_stat_fill = st.columns([10, 2, 15])
+    if st.session_state.class_stats is not None:
+        for class_stat in st.session_state.class_stats:
+            with c_stat_info:
+                print("race_stat   ", str(class_stat))
+                print(class_stat)
+                filler = str(class_stat['value'])
+                annotated_text(
+                    annotation(str(filler), class_stat['name'], font_size='25px', padding_top="16px",
+                               padding_bottom="16px")
+                    )
+            with c_stat_button_delete:
+                st.markdown(
+                    """
+                <style>
+                button {
+                    height: 5px;
+                    padding-top: 5px !important;
+                    padding-bottom: 5px !important;
+                    padding-right: 5px !important;
+                    padding-left: 5px !important;
+                }
+                </style>
+                """,
+                    unsafe_allow_html=True,
+                    )
+                # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
+                # print(uni_key)
+                # print(f"Before button creation with key: {uni_key}")
+                st.button(":wastebasket:", type="secondary", key=class_stat['name'],
+                          on_click=delete_stat_class_relation,
+                          args=(class_stat['stat_id'],
+                                class_['id']))
+                # print(f"After button creation with key: {uni_key}")
+            with c_stat_fill:
+                st.text("")
+
+    # --------------------------------------Trait Input----------------------------------------------
+    col_trait, col_trait_value, col_trait_button = st.columns(3)
+    stat_names = get_values_alchemy('stats', 'name')
+    with col_trait:
+        in_stat_name = st.selectbox("Stat", stat_names)
+        stat_id = get_stat_id('stats', in_stat_name)
+    with col_trait_value:
+        in_value = st.number_input("Value", step=1, key=in_stat_name+"-2")
+
+    with col_trait_button:
+        st.markdown("""
+                <style>
+                .blocker {
+                    font-size:0px;
+                    opacity:0;
+                }
+                </style>
+                """, unsafe_allow_html=True)
+
+        st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
+        st.button(":heavy_plus_sign:", type="primary", on_click=upsert_stat_for_class, args=(
+            {'stat_id': stat_id, 'class_id': class_['id'], 'value': in_value},), key="add_trait_button"
+                  )
+    st.divider()
+    # --------------------------------------Trait Input----------------------------------------------
+    return
+
+
+def add_trait_to_character():
+    names_from_primary_info = get_values_alchemy('primary_info', 'name')
+    st.session_state.key = st.selectbox("Select your character", names_from_primary_info)
+    character = get_character_by_name_alchemy(st.session_state.key)
+    st.session_state.character_traits = get_traits_for_character(character['id'])
+    print("char traits " + str(st.session_state.character_traits))
+    st.divider()
+
+    c_trait_info, c_trait_button_delete, c_trait_fill = st.columns([10, 2, 15])
+    if st.session_state.character_traits is not None:
+        for character_trait in st.session_state.character_traits:
+            with c_trait_info:
+                print(character_trait)
+                filler = str(character_trait['value'])
+                annotated_text(
+                    annotation(str(filler), character_trait['trait_name'], font_size='25px', padding_top="16px",
+                               padding_bottom="16px")
+                    )
+            with c_trait_button_delete:
+                st.markdown(
+                    """
+                <style>
+                button {
+                    height: 5px;
+                    padding-top: 5px !important;
+                    padding-bottom: 5px !important;
+                    padding-right: 5px !important;
+                    padding-left: 5px !important;
+                }
+                </style>
+                """,
+                    unsafe_allow_html=True,
+                    )
+                # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
+                # print(uni_key)
+                # print(f"Before button creation with key: {uni_key}")
+                st.button(":wastebasket:", type="secondary", key=character_trait['trait_name'],
+                          on_click=delete_trait_class_relation,
                           args=(character_trait['id'],
                                 character['id']))
                 # print(f"After button creation with key: {uni_key}")
@@ -781,8 +994,9 @@ def add_trait_to_character():
 
         st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
         st.button(":heavy_plus_sign:", type="primary", on_click=upsert_trait_for_character, args=(
-            {'trait_id': trait_id, 'character_id': character['id'], 'value':in_value},), key="add_trait_button"
+            {'trait_id': trait_id, 'character_id': character['id'], 'value': in_value},), key="add_trait_button"
                   )
+
 
 def empty_page():
     return

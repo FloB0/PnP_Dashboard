@@ -165,6 +165,28 @@ def get_race_by_name_alchemy(in_name):
     return None
 
 
+def get_class_by_name_alchemy(in_name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the table
+    table = Table('classes', metadata, autoload_with=engine)
+
+    # Construct the SELECT statement
+    stmt = select(table).where(table.c.name == in_name)
+
+    # Execute the statement and fetch the result
+    with engine.connect() as connection:
+        result = connection.execute(stmt).fetchone()
+
+    # If a record was found, return it as a dictionary
+    if result is not None:
+        return {result._fields[i]: result[i] for i in range(len(result._fields))}
+
+        # If no record was found, return None
+    return None
+
+
 def get_stat_by_name_alchemy(in_name):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -1170,6 +1192,130 @@ def upsert_trait_for_race(args):
 
         connection.commit()
 
+
+def upsert_trait_for_class(args):
+    class_id = args['class_id']
+    trait_id = args['trait_id']
+    value = args.get('value', None)  # Assumes that 'value' is optional
+
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the character_traits table
+    class_traits_table = Table('class_traits', metadata, autoload_with=engine)
+
+    # First, check if the trait already exists for the character
+    stmt = (
+        select(class_traits_table.c.trait_id)
+        .where(
+            (class_traits_table.c.class_id == class_id) &
+            (class_traits_table.c.trait_id == trait_id)
+            )
+    )
+
+    with engine.connect() as connection:
+        existing_trait = connection.execute(stmt).fetchone()
+
+        if existing_trait:  # If the trait already exists for the character, update the value if provided
+            if value is not None:
+                update_stmt = (
+                    update(class_traits_table)
+                    .where(
+                        (class_traits_table.c.class_id == class_id) &
+                        (class_traits_table.c.trait_id == trait_id)
+                    )
+                    .values(value=value)
+                )
+                connection.execute(update_stmt)
+        else:  # If the trait does not exist, insert a new row
+            insert_stmt = class_traits_table.insert().values(class_id=class_id, trait_id=trait_id, value=value)
+            connection.execute(insert_stmt)
+
+        connection.commit()
+
+
+def upsert_stat_for_race(args):
+    race_id = args['race_id']
+    stat_id = args['stat_id']
+    value = args.get('value', None)  # Assumes that 'value' is optional
+
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the character_traits table
+    race_stats_table = Table('race_stats', metadata, autoload_with=engine)
+
+    # First, check if the trait already exists for the character
+    stmt = (
+        select(race_stats_table.c.stat_id)
+        .where(
+            (race_stats_table.c.race_id == race_id) &
+            (race_stats_table.c.stat_id == stat_id)
+            )
+    )
+
+    with engine.connect() as connection:
+        existing_trait = connection.execute(stmt).fetchone()
+
+        if existing_trait:  # If the trait already exists for the character, update the value if provided
+            if value is not None:
+                update_stmt = (
+                    update(race_stats_table)
+                    .where(
+                        (race_stats_table.c.race_id == race_id) &
+                        (race_stats_table.c.stat_id == stat_id)
+                    )
+                    .values(value=value)
+                )
+                connection.execute(update_stmt)
+        else:  # If the trait does not exist, insert a new row
+            insert_stmt = race_stats_table.insert().values(race_id=race_id, stat_id=stat_id, value=value)
+            connection.execute(insert_stmt)
+
+        connection.commit()
+
+
+def upsert_stat_for_class(args):
+    class_id = args['class_id']
+    stat_id = args['stat_id']
+    value = args.get('value', None)  # Assumes that 'value' is optional
+
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the character_traits table
+    class_stats_table = Table('class_stats', metadata, autoload_with=engine)
+
+    # First, check if the trait already exists for the character
+    stmt = (
+        select(class_stats_table.c.stat_id)
+        .where(
+            (class_stats_table.c.class_id == class_id) &
+            (class_stats_table.c.stat_id == stat_id)
+            )
+    )
+
+    with engine.connect() as connection:
+        existing_trait = connection.execute(stmt).fetchone()
+
+        if existing_trait:  # If the trait already exists for the character, update the value if provided
+            if value is not None:
+                update_stmt = (
+                    update(class_stats_table)
+                    .where(
+                        (class_stats_table.c.class_id == class_id) &
+                        (class_stats_table.c.stat_id == stat_id)
+                    )
+                    .values(value=value)
+                )
+                connection.execute(update_stmt)
+        else:  # If the trait does not exist, insert a new row
+            insert_stmt = class_stats_table.insert().values(class_id=class_id, stat_id=stat_id, value=value)
+            connection.execute(insert_stmt)
+
+        connection.commit()
+
+
 def delete_item_stat_relation(item_id, stat_id):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -1250,6 +1396,66 @@ def delete_trait_race_relation(trait_id, race_id):
     print(f"Deleted {result.rowcount} rows.")
 
 
+def delete_trait_class_relation(trait_id, class_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats table
+    table = Table('class_traits', metadata, autoload_with=engine)
+
+    # Construct the DELETE statement
+    stmt = delete(table).where(
+        (table.c.class_id == class_id) & (table.c.trait_id == trait_id)
+        )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    print(f"Deleted {result.rowcount} rows.")
+
+
+def delete_stat_race_relation(stat_id, race_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats table
+    table = Table('race_stats', metadata, autoload_with=engine)
+
+    # Construct the DELETE statement
+    stmt = delete(table).where(
+        (table.c.race_id == race_id) & (table.c.stat_id == stat_id)
+        )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    print(f"Deleted {result.rowcount} rows.")
+
+
+def delete_stat_class_relation(stat_id, class_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats table
+    table = Table('class_stats', metadata, autoload_with=engine)
+
+    # Construct the DELETE statement
+    stmt = delete(table).where(
+        (table.c.class_id == class_id) & (table.c.stat_id == stat_id)
+        )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    print(f"Deleted {result.rowcount} rows.")
+
+
 def get_traits_for_character(character_id):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -1300,6 +1506,82 @@ def get_traits_for_race(race_id):
     traits_list = [dict(zip(column_names, row)) for row in results]
 
     return traits_list
+
+
+def get_traits_for_class(class_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the tables
+    traits = Table('traits', metadata, autoload_with=engine)
+    class_traits = Table('class_traits', metadata, autoload_with=engine)
+
+    # Construct the SELECT statement
+    stmt = (
+        select(traits, class_traits.c.value)
+        .join(class_traits, traits.c.trait_id == class_traits.c.trait_id)
+        .where(class_traits.c.class_id == class_id)
+        )
+
+    # Execute the statement and fetch results
+    with engine.connect() as connection:
+        results = connection.execute(stmt).fetchall()
+    print("results " + str(results))
+    # Convert results to a list of dictionaries
+    column_names = ["id", "trait_name", "description", "trait_type", "cost", "category", "value"]
+    traits_list = [dict(zip(column_names, row)) for row in results]
+
+    return traits_list
+
+def get_stats_for_race(race_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the tables
+    stats = Table('stats', metadata, autoload_with=engine)
+    race_stats = Table('race_stats', metadata, autoload_with=engine)
+
+    # Construct the SELECT statement
+    stmt = (
+        select(stats, race_stats.c.value)
+        .join(race_stats, stats.c.stat_id == race_stats.c.stat_id)
+        .where(race_stats.c.race_id == race_id)
+        )
+
+    # Execute the statement and fetch results
+    with engine.connect() as connection:
+        results = connection.execute(stmt).fetchall()
+    print("results " + str(results))
+    # Convert results to a list of dictionaries
+    stats_data = [{"stat_id": row[0], "name": row[1], "description": row[2], "type": row[3], "value": row[4]} for row in results]
+
+    return stats_data
+
+
+def get_stats_for_class(class_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the tables
+    stats = Table('stats', metadata, autoload_with=engine)
+    class_stats = Table('class_stats', metadata, autoload_with=engine)
+
+    # Construct the SELECT statement
+    stmt = (
+        select(stats, class_stats.c.value)
+        .join(class_stats, stats.c.stat_id == class_stats.c.stat_id)
+        .where(class_stats.c.class_id == class_id)
+        )
+
+    # Execute the statement and fetch results
+    with engine.connect() as connection:
+        results = connection.execute(stmt).fetchall()
+    print("results " + str(results))
+    # Convert results to a list of dictionaries
+    stats_data = [{"stat_id": row[0], "name": row[1], "description": row[2], "type": row[3], "value": row[4]} for row in results]
+
+    return stats_data
+
 # stat = {
 #     'name': 'nahkampf',
 #     'description': 'Der Umgang mit Nahkampfwaffen und das Schadenspotential werden über diesen Wert bestimmt.'
