@@ -7,6 +7,7 @@ from util import (
     get_stat_id, get_stats_for_item, upsert_stat_for_item, delete_item_stat_relation,
     insert_trait_alchemy, get_trait_from_id, get_trait_by_name_alchemy, update_trait_by_name,
     get_stats_for_trait, delete_trait_stat_relation, upsert_stat_for_trait, get_trait_id, delete_trait_alchemy,
+    fetch_all_from_table
     )
 import streamlit as st
 import time
@@ -340,6 +341,7 @@ def insert_trait():
         description = st.text_input('Description')
         type_in = st.selectbox('Type', options=['numerical', 'functional'])
         cost = st.number_input('Cost', step = 1)
+        category = st.selectbox('Type', options=['character', 'item', 'race', 'class'], index='character')
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
 
@@ -354,8 +356,9 @@ def insert_trait():
                     'trait_name': name,
                     'description': description,
                     'type': type_in,
-                    'cost': cost
-                }
+                    'cost': cost,
+                    'category': category
+                    }
                 insert_trait_alchemy(trait)
                 st.success('Trait added!')
                 st.session_state.submitted = False
@@ -412,8 +415,10 @@ def update_trait():
     :return:
     """
     st.title("Update trait")
-    names_from_stat = get_values_alchemy('traits', 'trait_name')
-    update_value = st.selectbox("Select trait to update", names_from_stat)
+    names_from_stat = fetch_all_from_table('traits')
+    traits_list = [d['trait_name'] for d in names_from_stat]
+    print(names_from_stat)
+    update_value = st.selectbox("Select trait to update", traits_list)
     from_stats = get_trait_by_name_alchemy(update_value)
     with st.form(key='trait_form', clear_on_submit=True):
         name = st.text_input('Name', from_stats[1])
@@ -421,6 +426,17 @@ def update_trait():
         new_type = st.selectbox('Type', options=['numerical', 'functional'],
                                 index=0 if from_stats[3] == 'numerical' else 1)
         cost_ = st.number_input('Cost', value=from_stats[4], step=1)
+        print(from_stats[5])
+        if from_stats[5] == 'character':
+            index = 0
+        elif from_stats[5] == 'item':
+            index = 1
+        elif from_stats[5] == 'race':
+            index = 2
+        elif from_stats[5] == 'class':
+            index = 3
+        new_cat = st.selectbox('Type', options=['character', 'item', 'race', 'class'], index=index)
+
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
 
@@ -435,8 +451,9 @@ def update_trait():
                     'trait_name': name,
                     'description': description,
                     'type': new_type,
-                    'cost': cost_
-                }
+                    'cost': cost_,
+                    'category': new_cat
+                    }
                 update_trait_by_name(from_stats[1], trait)
 
                 st.success('Trait updated!')

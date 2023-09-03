@@ -54,6 +54,28 @@ def get_values_alchemy(table_name: object, column_name: object) -> object:
     return values
 
 
+def fetch_all_from_table(table_name):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the table
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Create the select statement
+    stmt = table.select()
+
+    # Execute the statement and fetch all results
+    with engine.connect() as connection:
+        results = connection.execute(stmt).fetchall()
+    print(results)
+
+    # Convert results to a list of dictionaries
+    rows = [row._asdict() for row in results]
+
+    return rows
+
+
+
 # inserts a new character to the database
 def insert_character_alchemy(character):
     engine = init_connection_alchemy()
