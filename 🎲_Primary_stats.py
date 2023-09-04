@@ -66,6 +66,10 @@ def app():
             st.title(f"Primary Abilities - {st.session_state['active_char']['name']}")
             col_hp_belief, col_fill1, col_shield_corruption = st.columns([10,5,10])
             with col_hp_belief:
+                print(st.session_state['active_char']['hp'])
+                print(st.session_state['active_char']['belief'])
+                print(st.session_state['active_char']['shield'])
+                print(st.session_state['active_char']['corruption'])
                 st.session_state['active_char']['hp'] = st.slider('Hitpoint', min_value=0, max_value=150,
                                                                   value=st.session_state['active_char']['hp'], step=1)
                 st.session_state['active_char']['belief'] = st.slider('Glauben', min_value=0, max_value=150,
