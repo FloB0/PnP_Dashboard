@@ -8,7 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 import time
 from streamlit import session_state as ss
 
-DATABASE_URI = f"mysql+mysqlconnector://{st.secrets['AZURE_SQL']['USERNAME']}:{st.secrets['AZURE_SQL']['PASSWORD']}@{st.secrets['AZURE_SQL']['SERVER']}/{st.secrets['AZURE_SQL']['DATABASE']}"
+DATABASE_URI = f"mysql+mysqlconnector://{st.secrets['MYSQL']['USERNAME']}:{st.secrets['MYSQL']['PASSWORD']}@{st.secrets['MYSQL']['SERVER']}/{st.secrets['MYSQL']['DATABASE']}"
 
 
 @st.cache_resource
