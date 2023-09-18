@@ -21,7 +21,7 @@ def get_values_alchemy(table_name: object, column_name: object) -> object:
     engine = init_connection_alchemy()
 
     # Your database name
-    db_name = st.secrets["AZURE_SQL"]["DATABASE"]  # replace with your actual database name
+    db_name = st.secrets["MYSQL"]["DATABASE"]  # replace with your actual database name
 
     # Fetch valid table names from the database
     with engine.connect() as connection:
