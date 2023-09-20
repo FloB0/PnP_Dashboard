@@ -4,10 +4,15 @@ import mysql.connector
 from sqlalchemy import create_engine, text, MetaData, Table, select, insert, update, delete, inspect
 from streamlit_elements import elements, dashboard, mui, editor, media, lazy, sync, nivo
 from sqlalchemy.exc import SQLAlchemyError
+import os
 
 import time
 from streamlit import session_state as ss
 
+DB_USER = os.environ.get("DD_MYSQL_USER")
+DB_PASSWORD = os.environ.get("DD_MYSQL_PASSWORD")
+DB_SERVER = os.environ.get("DD_MYSQL_SERVER")
+DB_DATABASE = os.environ.get("DD_MYSQL_DATABASE")
 DATABASE_URI = f"mysql+mysqlconnector://{st.secrets['MYSQL']['USERNAME']}:{st.secrets['MYSQL']['PASSWORD']}@{st.secrets['MYSQL']['SERVER']}/{st.secrets['MYSQL']['DATABASE']}"
 
 
