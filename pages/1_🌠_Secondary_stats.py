@@ -28,6 +28,9 @@ if "active_char" in st.session_state:
         c131.markdown(f'<p class="big-font">Wissen</p>', unsafe_allow_html=True)
     with st.container():
         c21.markdown(f'<p class="big-font">Nahkampf</p>', unsafe_allow_html=True)
+        print(st.session_state['active_char']['kk'])
+        print(st.session_state['active_char']['p'])
+        print(st.session_state['active_char']['nahkampf'])
         c22.markdown('<p class="big-font">{}</p>'.format(st.session_state['active_char']['kk'] * 2 +
                                                          st.session_state['active_char']['p'] +
                                                          st.session_state['active_char']['nahkampf']),
