@@ -795,7 +795,7 @@ def get_items_for_character(characterID):
     table = Table(table_name, metadata, autoload_with=engine)
 
     # Create the select statement to get all itemID and quantity for the specified characterID
-    stmt = select(table.c.itemID, table.c.quantity).where(table.c.characterID == characterID)
+    stmt = select(table.c.item_id, table.c.quantity).where(table.c.character_id == characterID)
 
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
