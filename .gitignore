@@ -6,7 +6,7 @@ venv/
 /SQL_queries/create_items_table.sql
 /SQL_queries/create_primary_info_table.sql
 /SQL_queries/create_race_table.sql
-/pages/5_tooltip_text.py
+/pages/6_tooltip_text.py
 /data/data.json
 /img/alien_häcksler.png
 /.idea/discord.xml

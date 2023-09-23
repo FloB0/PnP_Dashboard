@@ -1,4 +1,7 @@
 import streamlit as st
+from util import (get_values_alchemy, get_character_by_name_alchemy, increment_stat, decrement_stat,
+                  update_character_alchemy_updated, update_character_by_name, render_slider)
+import time
 
 
 st.set_page_config(
@@ -6,7 +9,7 @@ st.set_page_config(
     page_icon="🧊",
     layout="wide",
     initial_sidebar_state="collapsed"
-)
+    )
 st.markdown("""
 <style>
 .big-font {
@@ -23,10 +26,6 @@ styl = f"""
 </style>
 """
 st.markdown(styl, unsafe_allow_html=True)
-
-from util import (get_values_alchemy, get_character_by_name_alchemy, increment_stat, decrement_stat,
-                  update_character_alchemy_updated, update_character_by_name, render_slider)
-import time
 
 
 def app():
