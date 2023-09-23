@@ -22,3 +22,4 @@ venv/
 /test_pages/Text Page.py
 /.idea/vcs.xml
 /SQL_queries/sql_queries.py
+/_secret_auth_.json

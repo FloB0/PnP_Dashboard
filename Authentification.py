@@ -13,7 +13,8 @@ if __name__ == "__main__":
                              lottie_url='https://assets2.lottiefiles.com/packages/lf20_jcikwtux.json')
 
     LOGGED_IN = __login__obj.build_login_ui()
-    print(__login__obj.__getattribute__())
+    st.session_state.USERNAME = __login__obj.cookies["__streamlit_login_signup_ui_username__"]
+    print(st.session_state.USERNAME)
     if LOGGED_IN == True:
         st.session_state.LOGGED_IN = True
     else:
