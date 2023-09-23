@@ -1,5 +1,6 @@
 import streamlit as st
 
+
 st.set_page_config(
     page_title="DarkDystopia",
     page_icon="🧊",
@@ -24,7 +25,7 @@ styl = f"""
 st.markdown(styl, unsafe_allow_html=True)
 
 from util import (get_values_alchemy, get_character_by_name_alchemy, increment_stat, decrement_stat,
-                  update_character_alchemy_updated, update_character_by_name)
+                  update_character_alchemy_updated, update_character_by_name, render_slider)
 import time
 
 
@@ -42,6 +43,7 @@ def app():
             # If a character was found, display their information
             if character is not None:
                 st.session_state.logged_in = True
+                st.session_state.slider_key = 0
                 st.experimental_rerun()
             else:
                 st.error('The key you entered is invalid')
@@ -50,9 +52,8 @@ def app():
             st.session_state.char_fetched = False
 
         if not st.session_state.char_fetched:
-            character = get_character_by_name_alchemy(st.session_state.key)
-            st.session_state.active_char = character
-            # print(st.session_state.active_char)
+            st.session_state.fetched_character = get_character_by_name_alchemy(st.session_state.key)
+            st.session_state.active_char = st.session_state.fetched_character
             st.session_state.char_fetched = True
             st.experimental_rerun()
         else:
@@ -62,23 +63,21 @@ def app():
                 st.session_state.char_fetched = False
                 time.sleep(2)
                 st.experimental_rerun()
-            # The user is logged in
+
             st.title(f"Primary Abilities - {st.session_state['active_char']['name']}")
             col_hp_belief, col_fill1, col_shield_corruption = st.columns([10,5,10])
             with col_hp_belief:
-                print(st.session_state['active_char']['hp'])
-                print(st.session_state['active_char']['belief'])
-                print(st.session_state['active_char']['shield'])
-                print(st.session_state['active_char']['corruption'])
                 st.session_state['active_char']['hp'] = st.slider('Hitpoint', min_value=0, max_value=150,
-                                                                  value=st.session_state['active_char']['hp'], step=1)
+                                                                  value=st.session_state.fetched_character["hp"], step=1, key= "silder_hp_" + str(st.session_state.slider_key))
                 st.session_state['active_char']['belief'] = st.slider('Glauben', min_value=0, max_value=150,
-                                                                  value=st.session_state['active_char']['belief'], step=1)
+                                                                  value=st.session_state.fetched_character["belief"], step=1, key= "silder_belief_" + str(st.session_state.slider_key))
             with col_shield_corruption:
                 st.session_state['active_char']['shield'] = st.slider('Schild', min_value=0, max_value=150,
-                                                                  value=st.session_state['active_char']['shield'], step=1)
+                                                                  value=st.session_state.fetched_character["shield"], step=1, key= "silder_shield_" + str(st.session_state.slider_key))
+
                 st.session_state['active_char']['corruption'] = st.slider('Korruption', min_value=0, max_value=150,
-                                                                  value=st.session_state['active_char']['corruption'], step=1)
+                                                                  value=st.session_state.fetched_character["corruption"], step=1, key= "silder_corruption_" + str(st.session_state.slider_key))
+
             st.divider()
             c100, c110, c120 = st.columns(3)
             c1, c2, c3, c4, c5, c6, c7, c8, c9, c10, c11, c12 = st.columns([5, 2, 1, 1, 5, 2, 1, 1, 5, 2, 1, 1])
@@ -174,19 +173,36 @@ def app():
             if 'active_char' in st.session_state:
                 if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
                     if st.button("Reset", type="primary"):
-                        st.session_state["active_char"] = get_character_by_name_alchemy(st.session_state.key)
+                        # st.session_state["active_char"] = get_character_by_name_alchemy(st.session_state.key)
+                        # st.session_state.fetched_character["hp"] += 1
+                        # st.session_state.fetched_character["belief"] += 1
+                        # st.session_state.fetched_character["shield"] += 1
+                        # st.session_state.fetched_character["corruption"] += 1
+                        st.session_state.slider_key += 1
+                        st.session_state.char_fetched = False
+                        st.cache_data.clear()
+                        del st.session_state['active_char']
+                        del st.session_state['fetched_character']
                         st.experimental_rerun()
+
+#---------------------------------------------------------VVVV___UPDATE___VVVV________________________________________
+
         with c43:
             if 'active_char' in st.session_state:
                 if st.session_state.active_char != get_character_by_name_alchemy(st.session_state.key):
                     if st.button("Update", type="primary"):
                         update_character_by_name('primary_info', st.session_state.key,
                                                          st.session_state['active_char'])
+                        st.session_state.char_fetched=False
+                        del st.session_state['active_char']
+                        del st.session_state['fetched_character']
+                        st.cache_data.clear()
                         st.experimental_rerun()
         with c41:
             if st.button('Log Out'):
                 st.session_state.logged_in = False
                 st.session_state.char_fetched = False
+                st.cache_data.clear()
                 del st.session_state['active_char']
                 st.experimental_rerun()
 

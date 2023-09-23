@@ -125,7 +125,7 @@ def insert_data_alchemy(table_name, data):
         connection.execute(stmt)
         connection.commit()
 
-
+@st.cache_data
 def get_character_by_name_alchemy(in_name):
     engine = init_connection_alchemy()
     metadata = MetaData()
@@ -1586,6 +1586,11 @@ def get_stats_for_class(class_id):
     stats_data = [{"stat_id": row[0], "name": row[1], "description": row[2], "type": row[3], "value": row[4]} for row in results]
 
     return stats_data
+
+
+def render_slider(description,starting_value, start, end):
+    slider_value = st.slider(label = description,value = starting_value, min_value=start, max_value=end, step=1)
+    return slider_value
 
 # stat = {
 #     'name': 'nahkampf',
