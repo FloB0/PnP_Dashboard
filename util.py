@@ -1610,6 +1610,47 @@ def check_user_admin(username: str) -> bool:
                 pass
     return False
 
+def get_all_usernames():
+    """
+    Fetch all usernames from the JSON data.
+    :return: List of usernames.
+    """
+
+    usernames = []
+
+    with open("_secret_auth_.json", "r") as auth_json:
+        authorized_user_data = json.load(auth_json)
+
+    for user in authorized_user_data:
+        usernames.append(user["username"])
+
+    return usernames
+
+
+def modify_user_admin_status(username, admin_status):
+    """
+    Modify the admin status of a user in the JSON data.
+    :param username: The username of the user.
+    :param admin_status: The new admin status (True or False).
+    :return: None
+    """
+
+    with open("_secret_auth_.json", "r") as auth_json:
+        authorized_user_data = json.load(auth_json)
+
+    # Locate the user and modify the 'is_admin' status
+    for user in authorized_user_data:
+        if user["username"] == username:
+            user["is_admin"] = admin_status
+            break
+    else:  # This else corresponds to the for loop (not a common pattern, but valid).
+        print(f"User {username} not found!")
+        return
+
+    # Write the modified data back to the file
+    with open("_secret_auth_.json", "w") as auth_json_write:
+        json.dump(authorized_user_data, auth_json_write, indent=4)  # Using indent for pretty-printing
+
 # stat = {
 #     'name': 'nahkampf',
 #     'description': 'Der Umgang mit Nahkampfwaffen und das Schadenspotential werden über diesen Wert bestimmt.'

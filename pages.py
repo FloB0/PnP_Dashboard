@@ -11,7 +11,8 @@ from util import (
     upsert_trait_for_character, get_trait_id, get_race_by_name_alchemy, get_traits_for_race, delete_trait_race_relation,
     upsert_trait_for_race, get_stats_for_race, delete_stat_race_relation, upsert_stat_for_race,
     get_class_by_name_alchemy, delete_trait_class_relation, get_traits_for_class, upsert_trait_for_class,
-    get_stats_for_class, upsert_stat_for_class, delete_stat_class_relation
+    get_stats_for_class, upsert_stat_for_class, delete_stat_class_relation, get_all_usernames, check_user_admin,
+    modify_user_admin_status,
     )
 import streamlit as st
 import time
@@ -997,6 +998,17 @@ def add_trait_to_character():
             {'trait_id': trait_id, 'character_id': character['id'], 'value': in_value},), key="add_trait_button"
                   )
 
+def manage_user_rights():
+    usernames = get_all_usernames()
+    username = st.selectbox("Select user", usernames)
+
+    is_admin = st.toggle("User/Admin", value = check_user_admin(username))
+    if is_admin:
+        st.write("{username} is Admin".format(username=username))
+    if not is_admin:
+        st.write("{username} is User.".format(username=username))
+    if st.button("Set rights"):
+        modify_user_admin_status(username, is_admin)
 
 def empty_page():
     return
