@@ -46,27 +46,24 @@ def app():
 
 
 if __name__ == "__main__":
-    with st.form(key='auth_token', clear_on_submit=True):
-        inToken = st.text_input(label= "Authentication Token")
-        st.form_submit_button("Submit", on_click=on_submit_click)
+    if not (st.session_state.AUTHENTICATED or st.session_state.ADMIN):
+        with st.form(key='auth_token', clear_on_submit=True):
+            inToken = st.text_input(label= "Authentication Token")
+            st.form_submit_button("Submit", on_click=on_submit_click)
 
-        if st.session_state.get('submitted', False):
-            print(inToken)
-            print(ADMIN_AUTH_TOKEN)
-            print(inToken == ADMIN_AUTH_TOKEN)
-            if inToken == ADMIN_AUTH_TOKEN:
-                st.toast("Authentication successful")
-                st.session_state.AUTHENTICATED = True
-                sleep(2)
-            else:
-                st.toast("Authentication not successful")
-                sleep(2)
-
+            if st.session_state.get('submitted', False):
+                if inToken == ADMIN_AUTH_TOKEN:
+                    st.toast("Authentication successful", icon="✅")
+                    st.session_state.AUTHENTICATED = True
+                    sleep(2)
+                else:
+                    st.toast("Authentication not successful", icon="🚨")
+                    sleep(2)
+    if st.session_state.AUTHENTICATED and st.session_state.LOGGED_IN:
+        app()
     if not st.session_state.LOGGED_IN:
         st.write("Please login to access this content.")
-        if not st.session_state.ADMIN or not st.session_state.AUTHENTICATED:
-            st.write("You are not an admin. Please use admin account or contact the support team.")
-        else:
-            app()
-    else:
-        st.write("Not authenticated or admin. Please use admin account.")
+    if not st.session_state.ADMIN and not (st.session_state.AUTHENTICATED and st.session_state.LOGGED_IN):
+        st.write("You are not an admin. Please use admin account or contact the support team.")
+    if st.session_state.LOGGED_IN and st.session_state.ADMIN:
+        app()
