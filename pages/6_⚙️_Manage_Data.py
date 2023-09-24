@@ -20,7 +20,7 @@ st.set_page_config(
 def app():
     page_names_to_funcs = {
         "-": empty_page,
-        "Insert Character": insert_character,
+        # "Insert Character": insert_character, # this page moved to a own page accessible by users
         "Insert Class": insert_class,
         "Insert Item": insert_item,
         "Insert Race": insert_race,

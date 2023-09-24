@@ -125,7 +125,7 @@ def delete_trait():
 
 def insert_character():
     """
-
+    Depreciated since 24.09.23
     :return:
     """
     st.title("Create Character")
@@ -191,7 +191,8 @@ def insert_character():
                     'tv': tv,
                     'g': g,
                     'wi': wi,
-                    'c': c
+                    'c': c,
+                    'created_by': st.session_state.USERNAME
                     }
                 insert_character_alchemy(character)
                 st.success('Character created successfully!')
