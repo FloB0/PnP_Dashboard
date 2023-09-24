@@ -5,6 +5,7 @@ from sqlalchemy import create_engine, text, MetaData, Table, select, insert, upd
 from streamlit_elements import elements, dashboard, mui, editor, media, lazy, sync, nivo
 from sqlalchemy.exc import SQLAlchemyError
 import os
+import json
 
 import time
 from streamlit import session_state as ss
@@ -1591,6 +1592,23 @@ def get_stats_for_class(class_id):
 def render_slider(description,starting_value, start, end):
     slider_value = st.slider(label = description,value = starting_value, min_value=start, max_value=end, step=1)
     return slider_value
+
+def check_user_admin(username: str) -> bool:
+    """
+    Check if user is admin.
+    """
+    with open("_secret_auth_.json", "r") as auth_json:
+        authorized_user_data = json.load(auth_json)
+
+    for registered_user in authorized_user_data:
+        if registered_user['username'] == username:
+            try:
+                if registered_user['is_admin']:
+                    return True
+            except:
+                return False
+                pass
+    return False
 
 # stat = {
 #     'name': 'nahkampf',

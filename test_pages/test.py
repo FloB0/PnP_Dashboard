@@ -1,12 +1,4 @@
-from sqlalchemy import create_engine
-import streamlit as st
+import secrets
 
-DATABASE_URI = f"mysql+mysqlconnector://{st.secrets['MYSQL']['USERNAME']}:{st.secrets['MYSQL']['PASSWORD']}@{st.secrets['MYSQL']['SERVER']}/{st.secrets['MYSQL']['DATABASE']}"
-
-
-@st.cache_resource
-def init_connection_alchemy():
-    engine = create_engine(DATABASE_URI)
-    return engine
-
-print(init_connection_alchemy())
+token = secrets.token_hex(32)  # generates a 32-character long token
+print(token)

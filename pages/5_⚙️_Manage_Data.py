@@ -4,6 +4,11 @@ from pages import (
     delete_trait, add_trait_to_character, link_stat_trait_to_race, link_stat_trait_to_class,
     )
 import streamlit as st
+import os
+from util import on_submit_click
+from time import sleep
+
+ADMIN_AUTH_TOKEN = os.environ.get("ADMIN_AUTH_TOKEN")
 
 st.set_page_config(
     page_title="DarkDystopia",
@@ -41,7 +46,27 @@ def app():
 
 
 if __name__ == "__main__":
-    if st.session_state.LOGGED_IN:
-        app()
+    with st.form(key='auth_token', clear_on_submit=True):
+        inToken = st.text_input(label= "Authentication Token")
+        st.form_submit_button("Submit", on_click=on_submit_click)
+
+        if st.session_state.get('submitted', False):
+            print(inToken)
+            print(ADMIN_AUTH_TOKEN)
+            print(inToken == ADMIN_AUTH_TOKEN)
+            if inToken == ADMIN_AUTH_TOKEN:
+                st.toast("Authentication successful")
+                st.session_state.AUTHENTICATED = True
+                sleep(2)
+            else:
+                st.toast("Authentication not successful")
+                sleep(2)
+
+    if not st.session_state.LOGGED_IN:
+        st.write("Please login to access this content.")
+        if not st.session_state.ADMIN or not st.session_state.AUTHENTICATED:
+            st.write("You are not an admin. Please use admin account or contact the support team.")
+        else:
+            app()
     else:
-        st.write("Not authenticated. Please log in.")
+        st.write("Not authenticated or admin. Please use admin account.")
