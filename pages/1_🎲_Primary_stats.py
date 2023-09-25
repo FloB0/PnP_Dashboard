@@ -34,7 +34,11 @@ def app():
 
     if not st.session_state.logged_in:
         st.title("Character Dashboard")
-        names_from_primary_info = get_values_alchemy('primary_info', 'name')
+        names_from_primary_info = get_values_alchemy('primary_info', ['name','created_by'])
+        if not st.session_state.ADMIN:
+            names_from_primary_info = [entry['name'] for entry in names_from_primary_info if entry['created_by'] == st.session_state.USERNAME]
+        else:
+            names_from_primary_info = [entry['name'] for entry in names_from_primary_info]
         st.session_state.key = st.selectbox("Select your character", names_from_primary_info)
         if st.button('Choose Character'):
             character = get_character_by_name_alchemy(st.session_state.key)

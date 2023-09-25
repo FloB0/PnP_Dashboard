@@ -14,7 +14,7 @@ DB_USER = os.environ.get("DD_MYSQL_USER")
 DB_PASSWORD = os.environ.get("DD_MYSQL_PASSWORD")
 DB_SERVER = os.environ.get("DD_MYSQL_SERVER")
 DB_DATABASE = os.environ.get("DD_MYSQL_DATABASE")
-DATABASE_URI = f"mysql+mysqlconnector://{st.secrets['MYSQL']['USERNAME']}:{st.secrets['MYSQL']['PASSWORD']}@{st.secrets['MYSQL']['SERVER']}/{st.secrets['MYSQL']['DATABASE']}"
+DATABASE_URI = f"mysql+mysqlconnector://{DB_USER}:{DB_PASSWORD}@{DB_SERVER}/{DB_DATABASE}"
 
 
 @st.cache_resource
@@ -23,11 +23,11 @@ def init_connection_alchemy():
     return engine
 
 
-def get_values_alchemy(table_name: object, column_name: object) -> object:
+def get_values_alchemy(table_name, column_names):
     engine = init_connection_alchemy()
 
     # Your database name
-    db_name = st.secrets["MYSQL"]["DATABASE"]  # replace with your actual database name
+    db_name = os.environ.get("DD_MYSQL_DATABASE")
 
     # Fetch valid table names from the database
     with engine.connect() as connection:
@@ -45,18 +45,23 @@ def get_values_alchemy(table_name: object, column_name: object) -> object:
             f"SELECT column_name FROM information_schema.columns WHERE table_name = '{table_name}' AND table_schema = '{db_name}'"))
         valid_columns = [row[0] for row in result.fetchall()]
 
-    # Validate column name
-    if column_name not in valid_columns:
-        raise ValueError("Invalid column name")
+    # If only one column name is provided as a string, convert it into a list
+    if isinstance(column_names, str):
+        column_names = [column_names]
 
-    # SQL command to select specified column from the specified table
-    sql = text(f"SELECT {column_name} FROM {table_name}")
+    # Validate column names
+    for col in column_names:
+        if col not in valid_columns:
+            raise ValueError(f"Invalid column name: {col}")
+
+    # SQL command to select specified columns from the specified table
+    columns_str = ', '.join(column_names)
+    sql = text(f"SELECT {columns_str} FROM {table_name}")
 
     with engine.connect() as connection:
         result = connection.execute(sql)
-        values = [row[0] for row in result.fetchall()]
+        values = [{column: value for column, value in zip(column_names, row)} for row in result.fetchall()]
 
-    # print(values)
     return values
 
 
