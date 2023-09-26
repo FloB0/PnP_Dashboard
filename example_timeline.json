@@ -1,0 +1,57 @@
+{
+    "title": {
+        "media": {
+          "url": "https://media.discordapp.net/attachments/945077390839787570/1106667744369320006/Sinatratron_orbital_bombardment_exterminatus_causes_tectonic_ch_07b91725-6cec-4898-aa16-f705514b302f.png?ex=651485a7&is=65133427&hm=03d88100bada816f923317476cf6392de7958374af484bc5793fe74486af5c86&=&width=1252&height=702",
+          "caption": " <a target=\"_blank\" href=''>credits</a>",
+          "credit": "Battleship Vengence"
+        },
+        "start_date": {
+          "year": "40000"
+        },
+        "text": {
+          "headline": "The space battle of Medusa",
+          "text": "<p>During a hard fought battle against the corruption from the deep dark, light got eaten by the dark and only a few remained. A small crew of heros that swore to never forgive and never forget what was lost on that day. And to make ends meat with the caos.</p>"
+        }
+    },
+    "events": [
+      {
+        "media": {
+          "url": "https://vimeo.com/143407878",
+          "caption": "How to Use TimelineJS (<a target=\"_blank\" href='https://timeline.knightlab.com/'>credits</a>)"
+        },
+        "start_date": {
+          "year": "50000"
+        },
+        "text": {
+          "headline": "TimelineJS<br>Easy-to-make, beautiful timelines.",
+          "text": "<p>TimelineJS is a populair tool from Knightlab. It has been used by more than 250,000 people to tell stories seen hundreds of millions of times, and is available in more than sixty languages. </p>"
+        }
+      },
+      {
+        "media": {
+          "url": "https://www.youtube.com/watch?v=CmSKVW1v0xM",
+          "caption": "Streamlit Components (<a target=\"_blank\" href='https://streamlit.io/'>credits</a>)"
+        },
+        "start_date": {
+          "year": "60000"
+        },
+        "text": {
+          "headline": "Streamlit Components<br>version 0.63.0",
+          "text": "Streamlit lets you turn data scripts into sharable web apps in minutes, not weeks. It's all Python, open-source, and free! And once you've created an app you can use our free sharing platform to deploy, manage, and share your app with the world."
+        }
+      },
+      {
+        "media": {
+          "url": "https://github.com/innerdoc/streamlit-timeline/raw/main/component-logo.png",
+          "caption": "github/innerdoc (<a target=\"_blank\" href='https://www.github.com/innerdoc/'>credits</a>)"
+        },
+        "start_date": {
+          "year": "90000"
+        },
+        "text": {
+          "headline": "Streamlit TimelineJS component",
+          "text": "Started with a demo on https://www.innerdoc.com/nlp-timeline/ . <br>Then made a <a href='https://github.com/innerdoc/streamlit-timeline'>Streamlit component</a> of it. <br>Then made a <a href='https://pypi.org/project/streamlit-timeline/'>PyPi package</a> for it."
+        }
+      }
+    ]
+}

@@ -1,6 +1,7 @@
 import streamlit as st
 from util import insert_data_alchemy, on_note_submit_click
 import time
+from streamlit_timeline import timeline
 
 st.set_page_config(
         page_title="DarkDystopia",
@@ -14,6 +15,10 @@ def app():
         st.session_state.note_submitted = False
 
     if "active_char" in st.session_state:
+        with open('example_timeline.json',"r") as f:
+            data = f.read()
+        timeline(data, height=800)
+
         with st.form(key='note_form', clear_on_submit=True):
             txt = st.text_area('Information to add as note to your character', placeholder="Enter note here...", height=250)
             # Create the submit button
