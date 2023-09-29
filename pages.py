@@ -1011,5 +1011,86 @@ def manage_user_rights():
     if st.button("Set rights"):
         modify_user_admin_status(username, is_admin)
 
+
+def create_timeline():
+    st.title("Create Timeline")
+    with st.form(key='timeline-form', clear_on_submit=True):
+        media_url = st.text_input('URL to a media file')
+        media_caption = st.text_input('Caption for the media file')
+        media_credit = st.text_input('Credit of the media file')
+        start_date_year =st.number_input("Start Year",step=1)
+        text_headline = st.text_input("Headline")
+        text_description = st.text_area('Description', placeholder="Enter story here...", height=250)
+        is_visible = st.toggle("Should the timeline be visible?",value= True)
+        # Create the submit button
+        st.form_submit_button("Submit", on_click=on_submit_click)
+
+        # If the submit button is clicked, insert the new character into the SQLite database
+        if st.session_state.get('submitted', False):
+            if text_headline in get_values_alchemy('Timeline', 'title_text_headline'):
+                st.warning('Timeline headline already in use.')
+            else:
+                timeline_data = {
+                    'title_media_url': media_url,
+                    'title_media_caption': media_caption,
+                    'title_media_credit': media_credit,
+                    'title_start_date_year': start_date_year,
+                    'title_text_headline': text_headline,
+                    'title_text_description': text_description,
+                    'created_by': st.session_state.USERNAME,
+                    'visible': is_visible
+                    }
+                insert_data_alchemy('Timeline', timeline_data)
+                st.success('Timeline created successfully!')
+                st.session_state.submitted = False
+                st.session_state.show_form = False
+                st.toast("Timeline created successfully!", icon="✅")
+                time.sleep(2)
+                st.experimental_rerun()
+    return
+
+
+def create_event():
+    st.title("Create Event")
+    with st.form(key='event-form', clear_on_submit=True):
+        media_url = st.text_input('URL to a media file')
+        media_caption = st.text_input('Caption for the media file')
+        start_date_year = st.number_input("Start Year", step=1)
+        text_headline = st.text_input("Headline")
+        text_description = st.text_area('Description', placeholder="Enter story here...", height=250)
+        is_visible = st.toggle("Should the Event be visible for other users to add?", value=True)
+        # Create the submit button
+        st.form_submit_button("Submit", on_click=on_submit_click)
+
+        # If the submit button is clicked, insert the new character into the SQLite database
+        if st.session_state.get('submitted', False):
+            if text_headline in get_values_alchemy('Timeline', 'title_text_headline'):
+                st.warning('Timeline headline already in use.')
+            else:
+                event_data = {
+                    'media_url': media_url,
+                    'media_caption': media_caption,
+                    'start_date_year': start_date_year,
+                    'text_headline': text_headline,
+                    'text_description': text_description,
+                    'created_by': st.session_state.USERNAME,
+                    'visible': is_visible
+                    }
+                insert_data_alchemy('Event', event_data)
+                st.success('Event created successfully!')
+                st.session_state.submitted = False
+                st.session_state.show_form = False
+                st.toast("Event created successfully!", icon="✅")
+                time.sleep(2)
+                st.experimental_rerun()
+    return
+
+
+def connect_event_timeline():
+    st.title("Link Events to a Timeline")
+    timelines = get_values_alchemy("Timeline", ["title_text_headline"])
+    st.selectbox("To which timeline do you want to add an event?", timelines)
+    return
+
 def empty_page():
     return
