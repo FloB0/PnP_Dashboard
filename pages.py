@@ -318,11 +318,11 @@ def insert_stat():
         if st.session_state.get('submitted', False):
             if name == '':
                 st.warning('Please enter a name before submitting.')
-            elif name in get_values_alchemy('stats', 'name'):
+            elif name in get_values_alchemy('stats', 'stat_name'):
                 st.warning('Name already taken. Please try something else')
             else:
                 stats = {
-                    'name': name,
+                    'stat_name': name,
                     'description': description,
                     'type': type_in
                     }
@@ -347,7 +347,8 @@ def insert_trait():
         description = st.text_input('Description')
         type_in = st.selectbox('Type', options=['numerical', 'functional'])
         cost = st.number_input('Cost', step=1)
-        category = st.selectbox('Type', options=['character', 'item', 'race', 'class'], index='character')
+        category = st.selectbox('Type', options=['character', 'item', 'race', 'class'], index=0)
+        # category = st.selectbox('Type', options=[1, 2, 3, 4], index=1)
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
 
@@ -381,14 +382,15 @@ def update_stat():
     :return:
     """
     st.title("Update stat")
-    names_from_stat = get_values_alchemy('stats', 'name')
+    names_from_stat = get_values_alchemy('stats', 'stat_name')
+    names_from_stat = [d["stat_name"] for d in names_from_stat]
     update_value = st.selectbox("Select stat to update", names_from_stat)
     from_stats = get_stat_by_name_alchemy(update_value)
     with st.form(key='stat_form', clear_on_submit=True):
         name = st.text_input('Name', from_stats[1])
-        description = st.text_input('Description', from_stats[2])
+        description = st.text_input('Description', from_stats[3])
         new_type = st.selectbox('Type', options=['numerical', 'functional'],
-                                index=0 if from_stats[3] == 'numerical' else 1)
+                                index=0 if from_stats[2] == 'numerical' else 1)
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
 
@@ -396,11 +398,11 @@ def update_stat():
         if st.session_state.get('submitted', False):
             if name == '':
                 st.warning('Please enter a name before submitting.')
-            elif name in get_values_alchemy('stats', 'name') and update_value != name:
+            elif name in get_values_alchemy('stats', 'stat_name') and update_value != name:
                 st.warning('Name already taken. Please try something else')
             else:
                 stats = {
-                    'name': name,
+                    'stat_name': name,
                     'description': description,
                     'type': new_type
                     }
@@ -487,6 +489,7 @@ def update_trait():
 def edit_item():
     st.title("Edit Item")
     item_from_dropdown = get_values_alchemy('items', 'name')
+    item_from_dropdown = [d["name"] for d in item_from_dropdown]
     show_item = st.selectbox("Select item to edit", item_from_dropdown)
     item_id = get_id('items', show_item)
     item = get_item_from_id(item_id)
@@ -537,7 +540,8 @@ def edit_item():
             st.text("")
     st.divider()
     col_stat, col_value, col_button = st.columns(3)
-    stat_names = get_values_alchemy('stats', 'name')
+    stat_names = get_values_alchemy('stats', 'stat_name')
+    stat_names = [d["stat_name"] for d in stat_names]
     with col_stat:
         in_stat_name = st.selectbox("Stat", stat_names)
         stat_id = get_stat_id('stats', in_stat_name)
@@ -659,8 +663,10 @@ def edit_trait():
 
 def link_stat_trait_to_race():
     names_from_primary_info = get_values_alchemy('race', 'name')
-    st.session_state.key = st.selectbox("Select Race", names_from_primary_info)
+    race_ = [d["name"] for d in names_from_primary_info]
+    st.session_state.key = st.selectbox("Select Race", race_)
     race_ = get_race_by_name_alchemy(st.session_state.key)
+    # race_ = get_values_alchemy('race', column_names= ['name','id'])
     st.session_state.race_traits = get_traits_for_race(race_['id'])
     # print("char traits " + str(st.session_state.race_traits))
     st.divider()
@@ -704,6 +710,7 @@ def link_stat_trait_to_race():
     # --------------------------------------Stat Input----------------------------------------------
     col_trait, col_trait_value, col_trait_button = st.columns(3)
     trait_names = get_values_alchemy('traits', 'trait_name')
+    trait_names = [d["trait_name"] for d in trait_names]
     with col_trait:
         in_trait_name = st.selectbox("Trait", trait_names)
         trait_id = get_trait_id('traits', in_trait_name)
@@ -769,7 +776,7 @@ def link_stat_trait_to_race():
 
     # --------------------------------------Trait Input----------------------------------------------
     col_trait, col_trait_value, col_trait_button = st.columns(3)
-    stat_names = get_values_alchemy('stats', 'name')
+    stat_names = get_values_alchemy('stats', 'stat_name')
     with col_trait:
         in_stat_name = st.selectbox("Stat", stat_names)
         stat_id = get_stat_id('stats', in_stat_name)
@@ -797,7 +804,8 @@ def link_stat_trait_to_race():
 
 def link_stat_trait_to_class():
     names_from_primary_info = get_values_alchemy('classes', 'name')
-    st.session_state.key = st.selectbox("Select Class", names_from_primary_info)
+    class_ = [d["name"] for d in names_from_primary_info]
+    st.session_state.key = st.selectbox("Select Class", class_)
     class_ = get_class_by_name_alchemy(st.session_state.key)
     st.session_state.class_traits = get_traits_for_class(class_['id'])
     # print("char traits " + str(st.session_state.class_traits))
@@ -934,7 +942,8 @@ def link_stat_trait_to_class():
 
 def add_trait_to_character():
     names_from_primary_info = get_values_alchemy('primary_info', 'name')
-    st.session_state.key = st.selectbox("Select your character", names_from_primary_info)
+    character_ = [d["name"] for d in names_from_primary_info]
+    st.session_state.key = st.selectbox("Select your character", character_)
     character = get_character_by_name_alchemy(st.session_state.key)
     st.session_state.character_traits = get_traits_for_character(character['id'])
     # print("char traits " + str(st.session_state.character_traits))
@@ -978,6 +987,7 @@ def add_trait_to_character():
     st.divider()
     col_trait, col_trait_value, col_trait_button = st.columns(3)
     trait_names = get_values_alchemy('traits', 'trait_name')
+    trait_names = [d["trait_name"] for d in trait_names]
     with col_trait:
         in_trait_name = st.selectbox("Trait", trait_names)
         trait_id = get_trait_id('traits', in_trait_name)
@@ -1088,7 +1098,7 @@ def create_event():
 
 def connect_event_timeline():
     st.title("Link Events to a Timeline")
-    timelines = get_values_alchemy("Timeline", ["title_text_headline"])
+    timelines = get_values_alchemy("Timeline", ["title_text_headline", "timeline_id"])
     st.selectbox("To which timeline do you want to add an event?", timelines)
     return
 

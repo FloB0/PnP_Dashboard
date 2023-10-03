@@ -14,7 +14,7 @@ def app():
     if "active_char" in st.session_state:
         create_item_elements_for_character_id(st.session_state.active_char["id"])
         st.divider()
-        item_names = get_values_alchemy(table_name='items', column_name='name')
+        item_names = get_values_alchemy(table_name='items', column_names=['name'])
         item_to_add = st.selectbox('Add Item', item_names)
         if st.button("Add Item"):
             add_item_to_character(st.session_state.active_char['id'], item_to_add)

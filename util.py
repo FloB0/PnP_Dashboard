@@ -206,7 +206,7 @@ def get_stat_by_name_alchemy(in_name):
     stats_table = Table('stats', metadata, autoload_with=engine)
 
     # Construct the SELECT statement
-    stmt = select(stats_table).where(stats_table.c.name == in_name)
+    stmt = select(stats_table).where(stats_table.c.stat_name == in_name)
 
     # Execute the statement and fetch the result
     with engine.connect() as connection:
@@ -616,7 +616,7 @@ def get_stat_id(table_name, name):
     table = Table(table_name, metadata, autoload_with=engine)
 
     # Create the select statement to get the ItemID for a given item name
-    stmt = select(table.c.stat_id).where(table.c.name == name)
+    stmt = select(table.c.stat_id).where(table.c.stat_name == name)
 
     with engine.connect() as connection:
         result = connection.execute(stmt).fetchone()
@@ -692,7 +692,7 @@ def get_stats_for_item(item_id):
     stmt = (
         select(
             item_stats_table.c.stat_id,
-            stats_table.c.name,
+            stats_table.c.stat_name,
             item_stats_table.c.value
         )
         .join(stats_table, item_stats_table.c.stat_id == stats_table.c.stat_id)
@@ -963,7 +963,7 @@ def insert_stat_alchemy(stat_data):
     existing_columns = set(column.name for column in list(table.columns))
     for column in stat_data.keys():
         if column not in existing_columns:
-            # print(f"Column {column} does not exist in table stats.")
+            print(f"Column {column} does not exist in table stats.")
             return
 
     # Use SQLAlchemy's insert() to build the insert statement
@@ -1028,7 +1028,7 @@ def update_stat_by_name(original_stat_name, updated_values):
     # Use SQLAlchemy's update() to build the update statement
     stmt = (
         update(table)
-        .where(table.c.name == original_stat_name)
+        .where(table.c.stat_name == original_stat_name)
         .values(updated_values)
     )
 

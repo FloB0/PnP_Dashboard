@@ -53,7 +53,7 @@ def app():
 if __name__ == "__main__":
     if not (st.session_state.AUTHENTICATED or st.session_state.ADMIN):
         with st.form(key='auth_token', clear_on_submit=True):
-            inToken = st.text_input(label= "Authentication Token")
+            inToken = st.text_input(label="Authentication Token")
             st.form_submit_button("Submit", on_click=on_submit_click)
 
             if st.session_state.get('submitted', False):
