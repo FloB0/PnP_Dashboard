@@ -341,7 +341,7 @@ def update_character_alchemy_updated(table_name, character_id, updated_values):
         return False
 
 
-def update_data_alchemy (table_name, table_column, value, updated_values, fields_to_exclude=None, fields_to_pop=None):
+def update_data_alchemy(table_name, table_column, value, updated_values, fields_to_exclude=None, fields_to_pop=None):
     """
     Update record(s) in a table based on a column value.
 

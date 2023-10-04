@@ -21,6 +21,7 @@ if __name__ == "__main__":
         st.session_state.LOGGED_IN = True
         if 'AUTHENTICATED' not in st.session_state:
             st.session_state.AUTHENTICATED = False
+
     else:
         st.session_state.LOGGED_IN = False
         st.session_state.AUTHENTICATED = False
