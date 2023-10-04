@@ -3,6 +3,7 @@ import sqlite3 as sql3
 import mysql.connector
 from sqlalchemy import create_engine, text, MetaData, Table, select, insert, update, delete, inspect
 from streamlit_elements import elements, dashboard, mui, editor, media, lazy, sync, nivo
+from sqlalchemy.engine import reflection
 from sqlalchemy.exc import SQLAlchemyError
 import os
 import json
@@ -337,6 +338,83 @@ def update_character_alchemy_updated(table_name, character_id, updated_values):
             return True
     except SQLAlchemyError as e:
         # print(f"Database error: {e}")
+        return False
+
+
+def update_data_alchemy (table_name, table_column, value, updated_values, fields_to_exclude=None, fields_to_pop=None):
+    """
+    Update record(s) in a table based on a column value.
+
+    Parameters:
+    - table_name: Name of the table to update.
+    - table_column: Column used to identify the record to update.
+    - value: Value used to identify the record to update.
+    - updated_values: Dictionary of column:value pairs to be updated.
+    - fields_to_exclude: Set of columns that should not be updated.
+
+    Returns:
+    - True if update was successful, False otherwise.
+    """
+
+    if fields_to_exclude is None:
+        fields_to_exclude = set()
+
+    if fields_to_pop is None:
+        fields_to_pop = set()
+    else:
+        # Pop specified fields
+        for field in fields_to_pop:
+            updated_values.pop(field, None)
+
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Use inspect to check if table exists
+    inspector = reflection.Inspector.from_engine(engine)
+    if not inspector.has_table(table_name):
+        print("{table_name} not found")
+        return False
+
+    table = Table(table_name, metadata, autoload_with=engine)
+
+    # Check if table has the specified column
+    if table_column not in [col.name for col in table.columns]:
+        print("{table_column} not found")
+        return False
+
+    # Check if provided columns in updated_values exist
+    existing_columns = set(column.name for column in list(table.columns))
+    for column_name in updated_values.keys():
+        if column_name not in existing_columns:
+            print("{column_name} not found")
+            return False
+
+    try:
+        with engine.connect() as connection:
+            # Check if record exists
+            record = connection.execute(
+                select(table.columns).where(getattr(table.c, table_column) == value)
+                ).fetchone()
+
+            if record:
+                # Update existing record
+                # Exclude fields that should not be updated
+                update_values = {k: v for k, v in updated_values.items() if k not in fields_to_exclude}
+                print("updating {value} with {update_values}".format(value=value, update_values= update_values))
+
+                upd_stmt = (
+                    update(table)
+                    .where(getattr(table.c, table_column) == value)
+                    .values(update_values)
+                )
+                print(f"Executing update: {upd_stmt}")  # print the update statement
+                result = connection.execute(upd_stmt)
+                print(f"Rows updated: {result.rowcount}")
+                return True
+            else:
+                print("sth went wrong")
+                return False
+    except SQLAlchemyError as e:
         return False
 
 

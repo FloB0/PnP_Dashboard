@@ -12,7 +12,7 @@ from util import (
     upsert_trait_for_race, get_stats_for_race, delete_stat_race_relation, upsert_stat_for_race,
     get_class_by_name_alchemy, delete_trait_class_relation, get_traits_for_class, upsert_trait_for_class,
     get_stats_for_class, upsert_stat_for_class, delete_stat_class_relation, get_all_usernames, check_user_admin,
-    modify_user_admin_status,
+    modify_user_admin_status, update_data_alchemy,
     )
 import streamlit as st
 import time
@@ -252,7 +252,7 @@ def insert_item():
         if st.session_state.get('submitted', False):
             if name == '':
                 st.warning('Please enter a name before submitting.')
-            elif name in get_values_alchemy('classes', 'name'):
+            elif name in get_values_alchemy('items', 'name'):
                 st.warning('Name already taken. Please try something else')
             else:
                 items = {
@@ -493,14 +493,39 @@ def edit_item():
     show_item = st.selectbox("Select item to edit", item_from_dropdown)
     item_id = get_id('items', show_item)
     item = get_item_from_id(item_id)
-    st.subheader(item[0][0])
-    name = st.text_input('Name', item[0][0])
-    image = st.text_input('Image URL', item[0][1])
-    st.session_state.show_image = image
-    # st.button("Show picture..")
-    if 'show_image' in st.session_state:
-        st.image(st.session_state.show_image)
-    description = st.text_input('Description', item[0][2])
+    with st.form(key="edit-item"):
+        st.subheader(item[0][0])
+        name = st.text_input('Name', item[0][0])
+        image = st.text_input('Image URL', item[0][1])
+        st.session_state.show_image = image
+        # st.button("Show picture..")
+        if 'show_image' in st.session_state:
+            st.image(st.session_state.show_image)
+        description = st.text_input('Description', item[0][2])
+
+        st.form_submit_button("Submit", on_click=on_submit_click)
+
+        # If the submit button is clicked, insert the new character into the SQLite database
+        if st.session_state.get('submitted', False):
+            if st.session_state.get('submitted', False):
+                if name == '':
+                    st.warning('Please enter a name before submitting.')
+                elif name in get_values_alchemy('items', 'name'):
+                    st.warning('Name already taken. Please try something else')
+                else:
+                    items = {
+                        'name': name,
+                        'description': description,
+                        'image_url': image
+                        }
+                update_data_alchemy(table_name="items",table_column="id", value=item_id, updated_values=items)
+                st.success('Item updated!')
+                st.session_state.submitted = False
+                st.session_state.show_form = False
+                st.toast("Item updated!", icon="✅")
+                time.sleep(2)
+                st.experimental_rerun()
+
 
     st.divider()
     st.session_state.item_stats = get_stats_for_item(item_id)
