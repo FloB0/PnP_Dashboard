@@ -1118,6 +1118,28 @@ def update_stat_by_name(original_stat_name, updated_values):
     return result.rowcount  # This will return the number of updated rows
 
 
+def update_item_by_name(original_item_name, updated_values):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the stats table
+    table = Table('items', metadata, autoload_with=engine)
+
+    # Use SQLAlchemy's update() to build the update statement
+    stmt = (
+        update(table)
+        .where(table.c.name == original_item_name)
+        .values(updated_values)
+    )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+    return result.rowcount
+
+
 def update_trait_by_name(original_trait_name, updated_values):
     engine = init_connection_alchemy()
     metadata = MetaData()

@@ -12,7 +12,7 @@ from util import (
     upsert_trait_for_race, get_stats_for_race, delete_stat_race_relation, upsert_stat_for_race,
     get_class_by_name_alchemy, delete_trait_class_relation, get_traits_for_class, upsert_trait_for_class,
     get_stats_for_class, upsert_stat_for_class, delete_stat_class_relation, get_all_usernames, check_user_admin,
-    modify_user_admin_status, update_data_alchemy,
+    modify_user_admin_status, update_data_alchemy, update_item_by_name,
     )
 import streamlit as st
 import time
@@ -507,6 +507,7 @@ def edit_item():
 
         # If the submit button is clicked, insert the new character into the SQLite database
         if st.session_state.get('submitted', False):
+            print(get_values_alchemy('items', ['name']))
             if st.session_state.get('submitted', False):
                 if name == '':
                     st.warning('Please enter a name before submitting.')
@@ -518,7 +519,10 @@ def edit_item():
                         'description': description,
                         'image_url': image
                         }
-                update_data_alchemy(table_name="items",table_column="id", value=item_id, updated_values=items)
+                print(items['name'])
+                result_ = update_item_by_name(show_item, items)
+                print(result_)
+                # update_data_alchemy(table_name="items",table_column="id", value=item_id, updated_values=items)
                 st.success('Item updated!')
                 st.session_state.submitted = False
                 st.session_state.show_form = False
