@@ -507,11 +507,13 @@ def edit_item():
 
         # If the submit button is clicked, insert the new character into the SQLite database
         if st.session_state.get('submitted', False):
-            print(get_values_alchemy('items', ['name']))
+            # print(get_values_alchemy('items', ['name']))
+            # print(name in get_values_alchemy('items', ['name']))
+            # print()
             if st.session_state.get('submitted', False):
                 if name == '':
                     st.warning('Please enter a name before submitting.')
-                elif name in get_values_alchemy('items', 'name'):
+                elif any(item['name'] == name for item in get_values_alchemy('items', ['name'])):
                     st.warning('Name already taken. Please try something else')
                 else:
                     items = {
@@ -519,16 +521,14 @@ def edit_item():
                         'description': description,
                         'image_url': image
                         }
-                print(items['name'])
-                result_ = update_item_by_name(show_item, items)
-                print(result_)
-                # update_data_alchemy(table_name="items",table_column="id", value=item_id, updated_values=items)
-                st.success('Item updated!')
-                st.session_state.submitted = False
-                st.session_state.show_form = False
-                st.toast("Item updated!", icon="✅")
-                time.sleep(2)
-                st.experimental_rerun()
+                    result_ = update_item_by_name(show_item, items)
+                    # update_data_alchemy(table_name="items",table_column="id", value=item_id, updated_values=items)
+                    st.success('Item updated!')
+                    st.session_state.submitted = False
+                    st.session_state.show_form = False
+                    st.toast("Item updated!", icon="✅")
+                    time.sleep(2)
+                    st.experimental_rerun()
 
 
     st.divider()
