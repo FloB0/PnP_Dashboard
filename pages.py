@@ -347,7 +347,7 @@ def insert_trait():
         description = st.text_input('Description')
         type_in = st.selectbox('Type', options=['numerical', 'functional'])
         cost = st.number_input('Cost', step=1)
-        category = st.selectbox('Type', options=['character', 'item', 'race', 'class'], index=0)
+        category = st.selectbox('Type', options=['all', 'character', 'item', 'race', 'class'], index=0)
         # category = st.selectbox('Type', options=[1, 2, 3, 4], index=1)
         # Create the submit button
         st.form_submit_button("Submit", on_click=on_submit_click)
