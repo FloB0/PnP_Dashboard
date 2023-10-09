@@ -799,7 +799,7 @@ def get_stats_for_trait(trait_id):
     stmt = (
         select(
             trait_stats_table.c.stat_id,
-            stats_table.c.name,
+            stats_table.c.stat_name,
             trait_stats_table.c.value
         )
         .join(stats_table, trait_stats_table.c.stat_id == stats_table.c.stat_id)
@@ -811,7 +811,7 @@ def get_stats_for_trait(trait_id):
         result = connection.execute(stmt).fetchall()
 
     # Convert results into a list of dictionaries for easier processing
-    stats_data = [{"stat_id": row[0], "name": row[1], "value": row[2]} for row in result]
+    stats_data = [{"stat_id": row[0], "stat_name": row[1], "value": row[2]} for row in result]
 
     return stats_data
 

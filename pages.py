@@ -637,7 +637,7 @@ def edit_trait():
             with c_trait_value:
                 filler = active_trait['value']
                 annotated_text(
-                    annotation(str(filler), active_trait['name'], font_size='25px', padding_top="16px",
+                    annotation(str(filler), active_trait['stat_name'], font_size='25px', padding_top="16px",
                                padding_bottom="16px")
                     )
             with c_trait_button:
@@ -658,7 +658,7 @@ def edit_trait():
                 # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
                 # print(uni_key)
                 # print(f"Before button creation with key: {uni_key}")
-                st.button(":wastebasket:", type="secondary", key=active_trait['name'],
+                st.button(":wastebasket:", type="secondary", key=active_trait['stat_name'],
                           on_click=delete_trait_stat_relation, args=(trait_id,
                                                                      active_trait['stat_id']))
                 # print(f"After button creation with key: {uni_key}")
@@ -666,7 +666,8 @@ def edit_trait():
                 st.text("")
         st.divider()
         col_trait, col_trait_value, col_trait_button = st.columns(3)
-        stat_names = get_values_alchemy('stats', 'name')
+        stat_names = get_values_alchemy('stats', 'stat_name')
+        stat_names = [d["stat_name"] for d in stat_names]
         with col_trait:
             in_stat_name = st.selectbox("Trait", stat_names)
             stat_id = get_stat_id('stats', in_stat_name)
