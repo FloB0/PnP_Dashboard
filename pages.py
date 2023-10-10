@@ -27,6 +27,7 @@ def delete_character():
     """
     st.title("Delete Character")
     names_from_primary_info = get_values_alchemy('primary_info', 'name')
+    names_from_primary_info = [d["name"] for d in names_from_primary_info]
     st.session_state.delete = st.selectbox("Select your character", names_from_primary_info)
     if st.button('Delete Character'):
         delete_character_alchemy(st.session_state.delete)
@@ -44,8 +45,9 @@ def delete_class():
     :return:
     """
     st.title("Delete Class")
-    names_from_primary_info = get_values_alchemy('classes', 'name')
-    st.session_state.delete = st.selectbox("Select class to delete", names_from_primary_info)
+    class_names = get_values_alchemy('classes', 'name')
+    class_names = [d["name"] for d in class_names]
+    st.session_state.delete = st.selectbox("Select class to delete", class_names)
     if st.button('Delete class'):
         delete_data_alchemy('classes', st.session_state.delete)
         st.success(f"Class {st.session_state.delete} was successfully removed.")
@@ -61,8 +63,9 @@ def delete_stat():
     :return:
     """
     st.title("Delete Stat")
-    names_from_stat = get_values_alchemy('stats', 'name')
-    st.session_state.delete = st.selectbox("Select stat to delete", names_from_stat)
+    stat_names = get_values_alchemy('stats', 'stat_name')
+    stat_names = [d["stat_name"] for d in stat_names]
+    st.session_state.delete = st.selectbox("Select stat to delete", stat_names)
     if st.button('Delete stat'):
         delete_data_alchemy('stats', st.session_state.delete)
         st.success(f"Stat {st.session_state.delete} was successfully removed.")
@@ -78,8 +81,9 @@ def delete_item():
     :return:
     """
     st.title("Delete Item")
-    names_from_primary_info = get_values_alchemy('items', 'name')
-    st.session_state.delete = st.selectbox("Select item to delete", names_from_primary_info)
+    item_names = get_values_alchemy('items', 'name')
+    item_names = [d["name"] for d in item_names]
+    st.session_state.delete = st.selectbox("Select item to delete", item_names)
     if st.button('Delete item'):
         delete_data_alchemy('items', st.session_state.delete)
         st.success(f"Item {st.session_state.delete} was successfully removed.")
@@ -95,8 +99,9 @@ def delete_race():
     :return:
     """
     st.title("Delete Race")
-    names_from_primary_info = get_values_alchemy('race', 'name')
-    st.session_state.delete = st.selectbox("Select race to delete", names_from_primary_info)
+    race_names = get_values_alchemy('race', 'name')
+    race_names = [d["name"] for d in race_names]
+    st.session_state.delete = st.selectbox("Select race to delete", race_names)
     if st.button('Delete race'):
         delete_data_alchemy('race', st.session_state.delete)
         st.success(f"Race {st.session_state.delete} was successfully removed.")
@@ -112,8 +117,9 @@ def delete_trait():
     :return:
     """
     st.title("Delete Trait")
-    names_from_primary_info = get_values_alchemy('traits', 'trait_name')
-    st.session_state.delete = st.selectbox("Select trait to delete", names_from_primary_info)
+    trait_names = get_values_alchemy('traits', 'trait_name')
+    trait_names = [d["trait_name"] for d in trait_names]
+    st.session_state.delete = st.selectbox("Select trait to delete", trait_names)
     if st.button('Delete Trait'):
         delete_trait_alchemy('traits', st.session_state.delete)
         st.success(f"Trait {st.session_state.delete} was successfully removed.")
@@ -599,7 +605,7 @@ def edit_item():
 def edit_trait():
     st.title("Edit Trait")
     trait_from_dropdown = fetch_all_from_table('traits')
-    desired_categories = ['character', 'item', 'race', 'class']
+    desired_categories = ['all','character', 'item', 'race', 'class']
     c_trait_select, c_cat_filter = st.columns([15, 5])
 
     with c_cat_filter:
