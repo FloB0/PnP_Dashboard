@@ -424,13 +424,13 @@ def update_trait():
     """
     st.title("Update trait")
     names_from_stat = fetch_all_from_table('traits')
-    desired_categories = ['character', 'item', 'race', 'class']
+    desired_categories = ['all', 'character', 'item', 'race', 'class']
     c_trait_select, c_cat_filter = st.columns([15, 5])
 
     with c_cat_filter:
-        filtered_cat = st.multiselect('Category', options=['All', 'character', 'item', 'race', 'class'],
-                                      default='All')
-        if 'All' in filtered_cat:
+        filtered_cat = st.multiselect('Category', options=['all', 'character', 'item', 'race', 'class'],
+                                      default='all')
+        if 'all' in filtered_cat:
             desired_categories_ = desired_categories
         else:
             desired_categories_ = filtered_cat
@@ -449,14 +449,16 @@ def update_trait():
                                     index=0 if from_stats[3] == 'numerical' else 1)
             cost_ = st.number_input('Cost', value=from_stats[4], step=1)
             if from_stats[5] == 'character':
-                index = 0
-            elif from_stats[5] == 'item':
                 index = 1
-            elif from_stats[5] == 'race':
+            elif from_stats[5] == 'item':
                 index = 2
-            elif from_stats[5] == 'class':
+            elif from_stats[5] == 'race':
                 index = 3
-            new_cat = st.selectbox('Type', options=['character', 'item', 'race', 'class'], index=index)
+            elif from_stats[5] == 'class':
+                index = 4
+            elif from_stats[5] == "all":
+                index = 0
+            new_cat = st.selectbox('Type', options=['all', 'character', 'item', 'race', 'class'], index=index)
 
             # Create the submit button
             st.form_submit_button("Submit", on_click=on_submit_click)
@@ -601,9 +603,9 @@ def edit_trait():
     c_trait_select, c_cat_filter = st.columns([15, 5])
 
     with c_cat_filter:
-        filtered_cat = st.multiselect('Category', options=['All', 'character', 'item', 'race', 'class'],
-                                      default='All')
-        if 'All' in filtered_cat:
+        filtered_cat = st.multiselect('Category', options=['all', 'character', 'item', 'race', 'class'],
+                                      default='all')
+        if 'all' in filtered_cat:
             desired_categories_ = desired_categories
         else:
             desired_categories_ = filtered_cat
