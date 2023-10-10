@@ -815,6 +815,7 @@ def link_stat_trait_to_race():
     # --------------------------------------Trait Input----------------------------------------------
     col_trait, col_trait_value, col_trait_button = st.columns(3)
     stat_names = get_values_alchemy('stats', 'stat_name')
+    stat_names = [d["stat_name"] for d in stat_names]
     with col_trait:
         in_stat_name = st.selectbox("Stat", stat_names)
         stat_id = get_stat_id('stats', in_stat_name)
@@ -888,6 +889,7 @@ def link_stat_trait_to_class():
     # --------------------------------------Stat Input----------------------------------------------
     col_trait, col_trait_value, col_trait_button = st.columns(3)
     trait_names = get_values_alchemy('traits', 'trait_name')
+    trait_names = [d["trait_name"] for d in trait_names]
     with col_trait:
         in_trait_name = st.selectbox("Trait", trait_names)
         trait_id = get_trait_id('traits', in_trait_name)
@@ -952,7 +954,8 @@ def link_stat_trait_to_class():
 
     # --------------------------------------Trait Input----------------------------------------------
     col_trait, col_trait_value, col_trait_button = st.columns(3)
-    stat_names = get_values_alchemy('stats', 'name')
+    stat_names = get_values_alchemy('stats', 'stat_name')
+    stat_names = [d["stat_name"] for d in stat_names]
     with col_trait:
         in_stat_name = st.selectbox("Stat", stat_names)
         stat_id = get_stat_id('stats', in_stat_name)
@@ -983,6 +986,7 @@ def add_trait_to_character():
     character_ = [d["name"] for d in names_from_primary_info]
     st.session_state.key = st.selectbox("Select your character", character_)
     character = get_character_by_name_alchemy(st.session_state.key)
+    print(character)
     st.session_state.character_traits = get_traits_for_character(character['id'])
     # print("char traits " + str(st.session_state.character_traits))
     st.divider()
@@ -1016,7 +1020,7 @@ def add_trait_to_character():
                 # print(uni_key)
                 # print(f"Before button creation with key: {uni_key}")
                 st.button(":wastebasket:", type="secondary", key=character_trait['trait_name'],
-                          on_click=delete_trait_class_relation,
+                          on_click=delete_trait_character_relation,
                           args=(character_trait['id'],
                                 character['id']))
                 # print(f"After button creation with key: {uni_key}")
@@ -1043,6 +1047,7 @@ def add_trait_to_character():
         """, unsafe_allow_html=True)
 
         st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
+        print({'trait_id': trait_id, 'character_id': character['id'], 'value': in_value})
         st.button(":heavy_plus_sign:", type="primary", on_click=upsert_trait_for_character, args=(
             {'trait_id': trait_id, 'character_id': character['id'], 'value': in_value},), key="add_trait_button"
                   )
@@ -1137,6 +1142,7 @@ def create_event():
 def connect_event_timeline():
     st.title("Link Events to a Timeline")
     timelines = get_values_alchemy("Timeline", ["title_text_headline", "timeline_id"])
+    timelines = [d["title_text_headline"] for d in timelines]
     st.selectbox("To which timeline do you want to add an event?", timelines)
     return
 

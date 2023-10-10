@@ -1261,6 +1261,25 @@ def upsert_trait_for_character(args):
             (character_traits_table.c.trait_id == trait_id)
         )
     )
+    with engine.connect() as connection:
+        existing_trait = connection.execute(stmt).fetchone()
+
+        if existing_trait:  # If the trait already exists for the character, update the value if provided
+            if value is not None:
+                update_stmt = (
+                    update(character_traits_table)
+                    .where(
+                        (character_traits_table.c.character_id == character_id) &
+                        (character_traits_table.c.trait_id == trait_id)
+                    )
+                    .values(value=value)
+                )
+                connection.execute(update_stmt)
+        else:  # If the trait does not exist, insert a new row
+            insert_stmt = character_traits_table.insert().values(character_id=character_id, trait_id=trait_id, value=value)
+            connection.execute(insert_stmt)
+
+        connection.commit()
 
 
 def upsert_trait_for_race(args):
@@ -1589,7 +1608,7 @@ def get_traits_for_character(character_id):
     # Convert results to a list of dictionaries
     column_names = ["id", "trait_name", "description", "trait_type", "cost", "category", "value"]
     traits_list = [dict(zip(column_names, row)) for row in results]
-
+    print(traits_list)
     return traits_list
 
 
