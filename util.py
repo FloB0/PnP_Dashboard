@@ -1803,3 +1803,33 @@ def modify_user_admin_status(username, admin_status):
 # 'steuerung': steuerung
 
 # print(get_stat_by_name_alchemy('a'))
+
+def insert_event_in_timeline (args):
+    timeline_id = args['timeline_id']
+    event_id = args['event_id']
+
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the Timeline_Event_Relation table
+    timeline_event_table = Table('Timeline_Event_Relation', metadata, autoload_with=engine)
+
+    # Check if the event already exists in the timeline
+    stmt = (
+        select(timeline_event_table.c.event_id)
+        .where(
+            (timeline_event_table.c.timeline_id == timeline_id) &
+            (timeline_event_table.c.event_id == event_id)
+            )
+    )
+
+    with engine.connect() as connection:
+        existing_event = connection.execute(stmt).fetchone()
+
+        # If the event does not exist in the timeline, insert a new row
+        if not existing_event:
+            insert_stmt = timeline_event_table.insert().values(timeline_id=timeline_id, event_id=event_id)
+            connection.execute(insert_stmt)
+        else:
+            return ValueError
+        connection.commit()

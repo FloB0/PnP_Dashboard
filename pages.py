@@ -12,7 +12,7 @@ from util import (
     upsert_trait_for_race, get_stats_for_race, delete_stat_race_relation, upsert_stat_for_race,
     get_class_by_name_alchemy, delete_trait_class_relation, get_traits_for_class, upsert_trait_for_class,
     get_stats_for_class, upsert_stat_for_class, delete_stat_class_relation, get_all_usernames, check_user_admin,
-    modify_user_admin_status, update_data_alchemy, update_item_by_name,
+    modify_user_admin_status, update_data_alchemy, update_item_by_name, insert_event_in_timeline,
     )
 import streamlit as st
 import time
@@ -1141,9 +1141,89 @@ def create_event():
 
 def connect_event_timeline():
     st.title("Link Events to a Timeline")
-    timelines = get_values_alchemy("Timeline", ["title_text_headline", "timeline_id"])
-    timelines = [d["title_text_headline"] for d in timelines]
-    st.selectbox("To which timeline do you want to add an event?", timelines)
+    timelines_ = get_values_alchemy("Timeline", ["title_text_headline", "timeline_id"])
+    print(timelines_)
+    timelines = [d["title_text_headline"] for d in timelines_]
+    print(timelines)
+    timeline_headline = st.selectbox("To which timeline do you want to add an event?", timelines)
+    selected_timeline_id = [timelines_['timeline_id'] for item in timelines_ if item["title_text_headline"] == timeline_headline]
+    print(selected_timeline_id[0])
+    timeline_events = get_values_alchemy('Timeline_Event_Relation',['timeline_id', 'event_id'])
+    event_ids = [item['event_id'] for item in timeline_events if item['timeline_id'] == selected_timeline_id]
+
+    st.session_state.events = event_ids
+    print(st.session_state.events)
+
+    # print("char traits " + str(st.session_state.character_traits))
+    st.divider()
+
+    # c_event_info, c_event_button_delete, c_event_fill = st.columns([10, 2, 15])
+    # if st.session_state.character_traits is not None:
+    #     for character_trait in st.session_state.character_traits:
+    #         with c_event_info:
+    #             # print(character_trait)
+    #             filler = str(character_trait['value'])
+    #             annotated_text(
+    #                 annotation(str(filler), character_trait['trait_name'], font_size='25px', padding_top="16px",
+    #                            padding_bottom="16px")
+    #                 )
+    #         with c_event_button_delete:
+    #             st.markdown(
+    #                 """
+    #             <style>
+    #             button {
+    #                 height: 5px;
+    #                 padding-top: 5px !important;
+    #                 padding-bottom: 5px !important;
+    #                 padding-right: 5px !important;
+    #                 padding-left: 5px !important;
+    #             }
+    #             </style>
+    #             """,
+    #                 unsafe_allow_html=True,
+    #                 )
+    #             # uni_key = str(item_id) + str(active_stat['stat_id']) + "_button_" + str(uuid.uuid4())
+    #             # print(uni_key)
+    #             # print(f"Before button creation with key: {uni_key}")
+    #             st.button(":wastebasket:", type="secondary", key=character_trait['trait_name'],
+    #                       on_click=delete_trait_character_relation,
+    #                       args=(character_trait['id'],
+    #                             character['id']))
+    #             # print(f"After button creation with key: {uni_key}")
+    #         with c_event_fill:
+    #             st.text("")
+    #
+    #
+    # st.divider()
+    # col_event, col_event_value, col_event_button = st.columns(3)
+    # trait_names = get_values_alchemy('traits', 'trait_name')
+    # trait_names = [d["trait_name"] for d in trait_names]
+    # with col_event:
+    #     in_trait_name = st.selectbox("Trait", trait_names)
+    #     trait_id = get_trait_id('traits', in_trait_name)
+    # with col_event_value:
+    #     in_value = st.number_input("Value", step=1)
+    #
+    # with col_event_button:
+    #     st.markdown("""
+    #     <style>
+    #     .blocker {
+    #         font-size:0px;
+    #         opacity:0;
+    #     }
+    #     </style>
+    #     """, unsafe_allow_html=True)
+    #
+    #     st.markdown(f'<p class="blocker">hhuhu<p>', unsafe_allow_html=True)
+    #     print({'trait_id': trait_id, 'character_id': character['id'], 'value': in_value})
+    #     st.button(":heavy_plus_sign:", type="primary", on_click=upsert_trait_for_character, args=(
+    #         {'trait_id': trait_id, 'character_id': character['id'], 'value': in_value},), key="add_trait_button"
+    #               )
+
+
+
+    # insert_event_in_timeline
+
     return
 
 def empty_page():
