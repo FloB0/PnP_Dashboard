@@ -1146,8 +1146,8 @@ def connect_event_timeline():
     timelines = [d["title_text_headline"] for d in timelines_]
     print(timelines)
     timeline_headline = st.selectbox("To which timeline do you want to add an event?", timelines)
-    selected_timeline_id = [timelines_['timeline_id'] for item in timelines_ if item["title_text_headline"] == timeline_headline]
-    print(selected_timeline_id[0])
+    selected_timeline_id = next((item['timeline_id'] for item in timelines_ if item['title_text_headline'] == timeline_headline), None)
+    print(selected_timeline_id)
     timeline_events = get_values_alchemy('Timeline_Event_Relation',['timeline_id', 'event_id'])
     event_ids = [item['event_id'] for item in timeline_events if item['timeline_id'] == selected_timeline_id]
 
