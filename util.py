@@ -1506,6 +1506,24 @@ def delete_trait_character_relation(trait_id, character_id):
     # print(f"Deleted {result.rowcount} rows.")
 
 
+def delete_timeline_event_relation(timeline_id, event_id):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+
+    # Reflect the item_stats table
+    table = Table('Timeline_Event_Relation', metadata, autoload_with=engine)
+
+    # Construct the DELETE statement
+    stmt = delete(table).where(
+        (table.c.timeline_id == timeline_id) & (table.c.event_id == event_id)
+        )
+
+    # Execute the statement
+    with engine.connect() as connection:
+        result = connection.execute(stmt)
+        connection.commit()
+
+
 def delete_trait_race_relation(trait_id, race_id):
     engine = init_connection_alchemy()
     metadata = MetaData()
