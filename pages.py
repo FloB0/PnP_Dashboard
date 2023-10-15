@@ -19,7 +19,7 @@ import streamlit as st
 import time
 import uuid
 from annotated_text import annotated_text, annotation
-
+from streamlit_timeline import timeline
 
 def delete_character():
     """
@@ -1222,8 +1222,30 @@ def connect_event_timeline():
         st.button(":heavy_plus_sign:", type="primary", on_click=insert_event_in_timeline, args=(
             {'event_id': event_id, 'timeline_id': selected_timeline_id},), key="add_trait_button"
                   )
+    with st.expander("See explanation"):
+        st.write("huhuhuhuhu")
+        output_data = {"events": []}
+        for item in st.session_state.events:
+            converted_item = {
+                "media": {
+                    "url": item['media_url'],
+                    "caption": item['media_caption'],
+                    # Adding "credit" field with a placeholder, as it is not available in the input
+                    "credit": "Placeholder Credit"
+                    },
+                "start_date": {
+                    "year": str(item['start_date_year'])
+                    },
+                "text": {
+                    "headline": item['text_headline'],
+                    "text": f"<p>{item['text_description']}</p>"
+                    }
+                }
 
-
+            output_data["events"].append(converted_item)
+        with open('example_timeline.json',"r") as f:
+            data = f.read()
+        timeline(output_data, height=800)
 
     # insert_event_in_timeline
 

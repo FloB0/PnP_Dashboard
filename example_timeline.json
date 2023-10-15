@@ -1,5 +1,6 @@
 {
-    "title": {
+    "events": [
+      {
         "media": {
           "url": "https://media.discordapp.net/attachments/945077390839787570/1106667744369320006/Sinatratron_orbital_bombardment_exterminatus_causes_tectonic_ch_07b91725-6cec-4898-aa16-f705514b302f.png?ex=651485a7&is=65133427&hm=03d88100bada816f923317476cf6392de7958374af484bc5793fe74486af5c86&=&width=1252&height=702",
           "caption": " <a target=\"_blank\" href=''>credits</a>",
@@ -12,8 +13,7 @@
           "headline": "The space battle of Medusa",
           "text": "<p>During a hard fought battle against the corruption from the deep dark, light got eaten by the dark and only a few remained. A small crew of heros that swore to never forgive and never forget what was lost on that day. And to make ends meat with the caos.</p>"
         }
-    },
-    "events": [
+      },
       {
         "media": {
           "url": "https://vimeo.com/143407878",
