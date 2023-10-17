@@ -657,8 +657,8 @@ def insert_or_increment_character_item(data):
 
     # Manually constructing the SQL statement
     sql = text(f"""
-        INSERT INTO {table_name} (characterID, itemID, quantity)
-        VALUES (:characterID, :itemID, 1)
+        INSERT INTO {table_name} (character_id, item_id, quantity)
+        VALUES (:character_id, :item_id, 1)
         ON DUPLICATE KEY UPDATE quantity = quantity + 1
     """)
 
@@ -745,13 +745,13 @@ def get_trait_id(table_name, name):
 
 def add_item_to_character(character_id, item_name):
     item_id = get_id(table_name='items', name=item_name)
-
+    print(item_id)
     if not item_id:
         return
 
     data = {
-        "characterID": character_id,
-        "itemID": item_id
+        "character_id": character_id,
+        "item_id": item_id
     }
 
     # Here you call your previously created function
@@ -982,9 +982,12 @@ def create_item_elements_for_character_id(characterID):
                     with mui.Card(key=str(item_counter), sx={"display": "flex", "flexDirection": "column"}):
                         quantity_iterator += 1
                         item_counter += 1
+                        def delete_this_item (event):
+                            print(event, " deleted")
+                            print(event.target)
                         mui.CardHeader(
                             title=item_list[0][0],
-                            action=mui.IconButton(mui.icon.DeleteOutline),
+                            action=mui.IconButton(mui.icon.DeleteOutline(onClick=delete_this_item)),
                             className="draggable"
                         )
                         mui.CardMedia(
@@ -994,9 +997,40 @@ def create_item_elements_for_character_id(characterID):
                             image=item_list[0][1],
                             alt=item_list[0][0],
                         )
+
                         with mui.CardContent(sx={"flex": 1}):
                             mui.Typography(item_list[0][2])
+    with elements("monaco_editors"):
 
+        # Streamlit Elements embeds Monaco code and diff editor that powers Visual Studio Code.
+        # You can configure editor's behavior and features with the 'options' parameter.
+        #
+        # Streamlit Elements uses an unofficial React implementation (GitHub links below for
+        # documentation).
+
+        from streamlit_elements import editor
+
+        if "content" not in st.session_state:
+            st.session_state.content = "Default value"
+
+        mui.Typography("Content: ", st.session_state.content)
+
+        def update_content (value):
+            st.session_state.content = value
+
+        editor.Monaco(
+            height=300,
+            defaultValue=st.session_state.content,
+            onChange=lazy(update_content)
+            )
+
+        mui.Button("Update content", onClick=sync())
+
+        editor.MonacoDiff(
+            original="Happy Streamlit-ing!",
+            modified="Happy Streamlit-in' with Elements!",
+            height=300,
+            )
 
 def increment_stat(stat):
     # Get the current value of the specified attribute from st.session_state
