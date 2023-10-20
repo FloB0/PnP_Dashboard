@@ -2,6 +2,8 @@ from uuid import uuid4
 from abc import ABC, abstractmethod
 from streamlit_elements import dashboard, mui
 from contextlib import contextmanager
+from streamlit import session_state as state
+from streamlit_elements import elements, sync, event
 
 
 class Dashboard:
@@ -88,8 +90,8 @@ class Card(Dashboard.Item):
             )
             mui.CardMedia(
                 component="img",
-                height=400,
-                width=300,
+                height=self._height,
+                width=self._width,
                 image=self._image,
                 alt=self._alt,
             )
@@ -101,3 +103,21 @@ class Card(Dashboard.Item):
                 mui.IconButton(mui.icon.Favorite)
                 mui.IconButton(mui.icon.Share)
                 mui.IconButton(mui.icon.Delete, onClick=self.delete)
+
+
+if "board" or "card" not in state:
+    board = Dashboard()
+    card=Card(board, x=0, y=0, w=3, h=4, title="Example", subheader="Subheader", image="https://cdn.discordapp.com/attachments/945077390839787570/1164314661538242670/earlnod_unholy_priest_rpg_character_casting_illumino_kinetica_u_f8d0c77f-3c43-4dd6-847a-8d40eb3c946c.png?ex=6542c387&is=65304e87&hm=0ce0da5b706b2701ee34e98049f4e499a340aa696721d72358402bc8a3113e75&", alt="Alt Text", content="Content here", item_id = 12, character_id= 53, width=300, height=400)
+
+    state.board = board
+    state.card = card
+
+else:
+    board = state.board
+    card = state.card
+
+    with elements("demo"):
+        event.Hotkey("ctrl+s", sync(), bindInputs=True, overrideDefault=True)
+
+        with board():  # using the board instance's __call__ method
+            card()
