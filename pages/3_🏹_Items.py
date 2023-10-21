@@ -1,7 +1,8 @@
 from util import create_item_elements_for_character_id, get_values_alchemy, add_item_to_character
 import time
 import streamlit as st
-
+from types import SimpleNamespace
+from classes_dashborad import *
 
 st.set_page_config(
         page_title="DarkDystopia",

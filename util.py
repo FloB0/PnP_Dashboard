@@ -968,7 +968,8 @@ def get_layout_character_item(character_id):
 
 def create_item_elements_for_character_id(characterID):
     layout = get_layout_character_item(characterID)
-    # print(layout)
+
+    print(layout)
     items = get_items_for_character(characterID)
     item_counter = 0
     with elements("Dashboard Items"):
@@ -978,7 +979,7 @@ def create_item_elements_for_character_id(characterID):
                 while quantity_iterator < items[key]:
                     # print('layout:', layout[item_counter]['i'])
                     item_list = get_item_from_id(key)
-                    # print(item_list)
+                    print(item_list)
                     with mui.Card(key=str(item_counter), sx={"display": "flex", "flexDirection": "column"}):
                         quantity_iterator += 1
                         item_counter += 1
@@ -1000,37 +1001,6 @@ def create_item_elements_for_character_id(characterID):
 
                         with mui.CardContent(sx={"flex": 1}):
                             mui.Typography(item_list[0][2])
-    with elements("monaco_editors"):
-
-        # Streamlit Elements embeds Monaco code and diff editor that powers Visual Studio Code.
-        # You can configure editor's behavior and features with the 'options' parameter.
-        #
-        # Streamlit Elements uses an unofficial React implementation (GitHub links below for
-        # documentation).
-
-        from streamlit_elements import editor
-
-        if "content" not in st.session_state:
-            st.session_state.content = "Default value"
-
-        mui.Typography("Content: ", st.session_state.content)
-
-        def update_content (value):
-            st.session_state.content = value
-
-        editor.Monaco(
-            height=300,
-            defaultValue=st.session_state.content,
-            onChange=lazy(update_content)
-            )
-
-        mui.Button("Update content", onClick=sync())
-
-        editor.MonacoDiff(
-            original="Happy Streamlit-ing!",
-            modified="Happy Streamlit-in' with Elements!",
-            height=300,
-            )
 
 def increment_stat(stat):
     # Get the current value of the specified attribute from st.session_state

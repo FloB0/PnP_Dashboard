@@ -79,6 +79,7 @@ class Card(Dashboard.Item):
     def delete(self):
         print("self._key | ", "Item ", self._item_id, "will be deleted from Character id: ", self._character_id)
         pass
+
     def __call__(self, content = None):
         with mui.Card(key=self._key, sx={"display": "flex", "flexDirection": "column", "borderRadius": 3, "overflow": "hidden"}, elevation=1):
             mui.CardHeader(
