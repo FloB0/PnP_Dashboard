@@ -86,7 +86,8 @@ class Card(Dashboard.Item):
                 title=self._title,
                 subheader=self._subheader,
                 avatar=mui.Avatar(self._title[0], sx={"bgcolor": "red"}),  # Assuming first letter of title as avatar
-                action=mui.IconButton(mui.icon.MoreVert),
+                # action=mui.IconButton(mui.icon.MoreVert),
+                action=mui.IconButton(mui.icon.Delete, onClick=self.delete),
                 className=self._draggable_class,
             )
             mui.CardMedia(
@@ -100,10 +101,10 @@ class Card(Dashboard.Item):
             with mui.CardContent(sx={"flex": 1}):
                 mui.Typography(self._content)
 
-            with mui.CardActions(disableSpacing=True):
-                mui.IconButton(mui.icon.Favorite)
-                mui.IconButton(mui.icon.Share)
-                mui.IconButton(mui.icon.Delete, onClick=self.delete)
+            # with mui.CardActions(disableSpacing=True):
+            #     mui.IconButton(mui.icon.Favorite)
+            #     mui.IconButton(mui.icon.Share)
+            #     mui.IconButton(mui.icon.Delete, onClick=self.delete)
 
 
 board = Dashboard()

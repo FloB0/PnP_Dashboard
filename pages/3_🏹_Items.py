@@ -22,6 +22,7 @@ def app():
         if st.button("Add Item"):
             add_item_to_character(st.session_state.active_char['id'], item_to_add)
             st.toast("Item added to your character", icon="✅")
+            st.session_state.item_added = True
             time.sleep(1)
             st.experimental_rerun()
     else:

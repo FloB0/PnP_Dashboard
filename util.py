@@ -946,7 +946,7 @@ def get_trait_from_id(traitID):
 
 def get_layout_character_item(character_id):
     items_from_character = get_items_for_character(character_id)
-    print(items_from_character)
+    # print(items_from_character)
     layout = []
     layout_iterator = 0
     layout_x = 0
@@ -971,7 +971,7 @@ def get_layout_character_item(character_id):
 
 def get_layout_items_character_item(character_id):
     items_from_character = get_items_for_character(character_id)
-    print(items_from_character)
+    # print(items_from_character)
     layout = []
     layout_iterator = 0
     layout_x = 0
@@ -990,6 +990,7 @@ def get_layout_items_character_item(character_id):
             dashboard_item["h"] = 4
             dashboard_item["id"] = item_set["id"]
             dashboard_item["name"] = item_set["name"]
+            dashboard_item["item_id"] = key
             dashboard_item["image_url"] = item_set["image_url"]
             dashboard_item["description"] = item_set["description"]
             # print("dasaaaasdh", dashboard_item)
@@ -1009,54 +1010,56 @@ def get_layout_items_character_item(character_id):
 def create_item_elements_for_character_id(characterID):
     # layout = get_layout_character_item(characterID)
     layout = get_layout_items_character_item(characterID)
-    print(layout)
-    items = get_items_for_character(characterID)
-    print("items ", items)
-    item_counter = 0
-    with elements("Dashboard Items"):
-        with dashboard.Grid(layout, draggableHandle=".draggable"):
-            for key in items:
-                quantity_iterator = 0
-                while quantity_iterator < items[key]:
-                    # print('layout:', layout[item_counter]['i'])
-                    item_list = get_item_from_id(key)
-                    print(item_list)
-                    with mui.Card(key=str(item_counter), sx={"display": "flex", "flexDirection": "column"}):
-                        quantity_iterator += 1
-                        item_counter += 1
-                        def delete_this_item (event):
-                            print(event, " deleted")
-                            print(event.target)
-                        mui.CardHeader(
-                            title=item_list["name"],
-                            action=mui.IconButton(mui.icon.DeleteOutline(onClick=delete_this_item)),
-                            className="draggable"
-                        )
-                        mui.CardMedia(
-                            component="img",
-                            height=400,
-                            width=300,
-                            image=item_list["image_url"],
-                            alt=item_list["name"],
-                        )
-
-                        with mui.CardContent(sx={"flex": 1}):
-                            mui.Typography(item_list["description"])
+    # print(layout)
+    # items = get_items_for_character(characterID)
+    # print("items ", items)
+    # item_counter = 0
+    # with elements("Dashboard Items"):
+    #     with dashboard.Grid(layout, draggableHandle=".draggable"):
+    #         for key in items:
+    #             quantity_iterator = 0
+    #             while quantity_iterator < items[key]:
+    #                 # print('layout:', layout[item_counter]['i'])
+    #                 item_list = get_item_from_id(key)
+    #                 print(item_list)
+    #                 with mui.Card(key=str(item_counter), sx={"display": "flex", "flexDirection": "column"}):
+    #                     quantity_iterator += 1
+    #                     item_counter += 1
+    #                     def delete_this_item (event):
+    #                         print(event, " deleted")
+    #                         print(event.target)
+    #                     mui.CardHeader(
+    #                         title=item_list["name"],
+    #                         action=mui.IconButton(mui.icon.DeleteOutline(onClick=delete_this_item)),
+    #                         className="draggable"
+    #                     )
+    #                     mui.CardMedia(
+    #                         component="img",
+    #                         height=400,
+    #                         width=300,
+    #                         image=item_list["image_url"],
+    #                         alt=item_list["name"],
+    #                     )
+    #
+    #                     with mui.CardContent(sx={"flex": 1}):
+    #                         mui.Typography(item_list["description"])
     if "item_board" not in st.session_state:
         st.session_state.item_board = Dashboard()
-    if "w" not in st.session_state:
+    if "w" not in st.session_state or st.session_state.item_added:
         w = SimpleNamespace()
         board = st.session_state.item_board
         for card in layout:
-            card_name = "card{}".format(card["id"])
+            card_name = "card{}".format(card["i"])
             card_obj = Card(board,
                             x=card["x"], y=card["y"], w=card["w"], h=card["h"],
                             title=card["name"], subheader="Subheader",
                             image=card["image_url"], alt=card["name"],
-                            content=card["description"], item_id=card["image_url"],
+                            content=card["description"], item_id=card["item_id"],
                             character_id=characterID, width=300, height=400)
             setattr(w, card_name, card_obj)
         st.session_state.w = w
+        st.session_state.item_added = False
+        st.experimental_rerun()
     else:
         w = st.session_state.w
         board = st.session_state.item_board
