@@ -911,7 +911,7 @@ def get_item_from_id(itemID):
         # Check if we have any results
         if results:
             # Convert the results into a dictionary format for easier access
-            items_dict = results
+            items_dict = {"id": itemID, "name": results[0][0], "image_url": results[0][1], "description": results[0][2]}
             return items_dict
         else:
             # print(f"No items found for characterID: {itemID}")
@@ -944,6 +944,7 @@ def get_trait_from_id(traitID):
 
 def get_layout_character_item(character_id):
     items_from_character = get_items_for_character(character_id)
+    print(items_from_character)
     layout = []
     layout_iterator = 0
     layout_x = 0
@@ -971,6 +972,7 @@ def create_item_elements_for_character_id(characterID):
 
     print(layout)
     items = get_items_for_character(characterID)
+    print("items ", items)
     item_counter = 0
     with elements("Dashboard Items"):
         with dashboard.Grid(layout, draggableHandle=".draggable"):
