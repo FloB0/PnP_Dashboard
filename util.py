@@ -7,6 +7,8 @@ from sqlalchemy.engine import reflection
 from sqlalchemy.exc import SQLAlchemyError
 import os
 import json
+from types import SimpleNamespace
+from classes_dashborad import *
 
 import time
 from streamlit import session_state as ss
@@ -967,9 +969,46 @@ def get_layout_character_item(character_id):
     return layout
 
 
-def create_item_elements_for_character_id(characterID):
-    layout = get_layout_character_item(characterID)
+def get_layout_items_character_item(character_id):
+    items_from_character = get_items_for_character(character_id)
+    print(items_from_character)
+    layout = []
+    layout_iterator = 0
+    layout_x = 0
+    layout_y = 0
+    for key in items_from_character:
+        # print("X: ", layout_x, " Y: ", layout_y)
+        item_set = get_item_from_id(key)
+        quantity_iterator = 0
+        while quantity_iterator < items_from_character[key]:
+            # dashboard_item = dashboard.Item(str(layout_iterator), layout_x, layout_y, 3, 4)
+            dashboard_item = {}
+            dashboard_item["i"] = str(layout_iterator)
+            dashboard_item["x"] = layout_x
+            dashboard_item["y"] = layout_y
+            dashboard_item["w"] = 3
+            dashboard_item["h"] = 4
+            dashboard_item["id"] = item_set["id"]
+            dashboard_item["name"] = item_set["name"]
+            dashboard_item["image_url"] = item_set["image_url"]
+            dashboard_item["description"] = item_set["description"]
+            # print("dasaaaasdh", dashboard_item)
+            layout.append(dashboard_item)
+            quantity_iterator += 1
+            layout_iterator += 1
+            if layout_x < 9:
+                layout_x += 3
+            else:
+                layout_y += 4
+                layout_x = 0
+        # print("print ",key)
+    # print(items_from_character)
+    return layout
 
+
+def create_item_elements_for_character_id(characterID):
+    # layout = get_layout_character_item(characterID)
+    layout = get_layout_items_character_item(characterID)
     print(layout)
     items = get_items_for_character(characterID)
     print("items ", items)
@@ -989,7 +1028,7 @@ def create_item_elements_for_character_id(characterID):
                             print(event, " deleted")
                             print(event.target)
                         mui.CardHeader(
-                            title=item_list[0][0],
+                            title=item_list["name"],
                             action=mui.IconButton(mui.icon.DeleteOutline(onClick=delete_this_item)),
                             className="draggable"
                         )
@@ -997,12 +1036,36 @@ def create_item_elements_for_character_id(characterID):
                             component="img",
                             height=400,
                             width=300,
-                            image=item_list[0][1],
-                            alt=item_list[0][0],
+                            image=item_list["image_url"],
+                            alt=item_list["name"],
                         )
 
                         with mui.CardContent(sx={"flex": 1}):
-                            mui.Typography(item_list[0][2])
+                            mui.Typography(item_list["description"])
+    if "item_board" not in st.session_state:
+        st.session_state.item_board = Dashboard()
+    if "w" not in st.session_state:
+        w = SimpleNamespace()
+        board = st.session_state.item_board
+        for card in layout:
+            card_name = "card{}".format(card["id"])
+            card_obj = Card(board,
+                            x=card["x"], y=card["y"], w=card["w"], h=card["h"],
+                            title=card["name"], subheader="Subheader",
+                            image=card["image_url"], alt=card["name"],
+                            content=card["description"], item_id=card["image_url"],
+                            character_id=characterID, width=300, height=400)
+            setattr(w, card_name, card_obj)
+        st.session_state.w = w
+    else:
+        w = st.session_state.w
+        board = st.session_state.item_board
+        with elements("demo"):
+            with board():
+                for card_attr in vars(w):
+                    card = getattr(w, card_attr)
+                    card()
+
 
 def increment_stat(stat):
     # Get the current value of the specified attribute from st.session_state
