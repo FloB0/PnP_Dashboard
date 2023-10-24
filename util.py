@@ -7,8 +7,8 @@ from sqlalchemy.engine import reflection
 from sqlalchemy.exc import SQLAlchemyError
 import os
 import json
-from types import SimpleNamespace
-from classes_dashborad import *
+# from types import SimpleNamespace
+# from classes_dashborad import *
 
 import time
 from streamlit import session_state as ss
@@ -817,39 +817,74 @@ def get_stats_for_trait(trait_id):
 
     return stats_data
 
-def decrement_or_delete_character_item(data):
-    engine = init_connection_alchemy()
-    metadata = MetaData()
+# def decrement_or_delete_character_item(data):
+#     engine = init_connection_alchemy()
+#     metadata = MetaData()
+#
+#     # The table name is hard-coded since we are specifically working with the 'character_items' table
+#     table_name = 'character_items'
+#     table = Table(table_name, metadata, autoload_with=engine)
+#
+#     # Check if provided columns exist in the table
+#     existing_columns = set(column.name for column in list(table.columns))
+#     for column in data.keys():
+#         if column not in existing_columns:
+#             # print(f"Column {column} does not exist in table {table_name}.")
+#             return
+#
+#     # Decrement the quantity by 1, and if the quantity becomes zero, delete the row
+#     with engine.connect() as connection:
+#         # Decrement Quantity
+#         sql = text(f"""
+#             UPDATE {table_name}
+#             SET quantity = quantity - 1
+#             WHERE characterID = :characterID AND itemID = :itemID;
+#         """)
+#         connection.execute(sql, **data)
+#
+#         # Delete the row if Quantity is 0
+#         del_stmt = delete(table).where(
+#             (table.c.characterID == data['characterID']) &
+#             (table.c.itemID == data['itemID']) &
+#             (table.c.Quantity == 0)
+#         )
+#         connection.execute(del_stmt)
+#         connection.commit()
 
-    # The table name is hard-coded since we are specifically working with the 'character_items' table
-    table_name = 'character_items'
-    table = Table(table_name, metadata, autoload_with=engine)
 
-    # Check if provided columns exist in the table
-    existing_columns = set(column.name for column in list(table.columns))
-    for column in data.keys():
-        if column not in existing_columns:
-            # print(f"Column {column} does not exist in table {table_name}.")
-            return
-
-    # Decrement the quantity by 1, and if the quantity becomes zero, delete the row
-    with engine.connect() as connection:
-        # Decrement Quantity
-        sql = text(f"""
-            UPDATE {table_name} 
-            SET quantity = quantity - 1 
-            WHERE characterID = :characterID AND itemID = :itemID;
-        """)
-        connection.execute(sql, **data)
-
-        # Delete the row if Quantity is 0
-        del_stmt = delete(table).where(
-            (table.c.characterID == data['characterID']) &
-            (table.c.itemID == data['itemID']) &
-            (table.c.Quantity == 0)
-        )
-        connection.execute(del_stmt)
-        connection.commit()
+# def decrement_or_delete_character_item(character_id, item_id, equipped):
+#     engine = init_connection_alchemy()
+#     metadata = MetaData()
+#
+#     table_name = 'character_items'
+#     table = Table(table_name, metadata, autoload_with=engine)
+#
+#     with engine.connect() as connection:
+#         # If the item was equipped, decrement the equipped column
+#         if equipped:
+#             sql_equipped = text(f"""
+#                 UPDATE {table_name}
+#                 SET equipped = equipped - 1
+#                 WHERE character_id = :character_id AND item_id = :item_id AND equipped > 0;
+#             """)
+#             connection.execute(sql_equipped, character_id=character_id, item_id=item_id)
+#
+#         # Decrement Quantity
+#         sql = text(f"""
+#             UPDATE {table_name}
+#             SET quantity = quantity - 1
+#             WHERE character_id = :character_id AND item_id = :item_id;
+#         """)
+#         connection.execute(sql, character_id=character_id, item_id=item_id)
+#
+#         # Delete the row if Quantity is 0
+#         del_stmt = delete(table).where(
+#             (table.c.character_id == character_id) &
+#             (table.c.item_id == item_id) &
+#             (table.c.quantity == 0)
+#         )
+#         connection.execute(del_stmt)
+#         connection.commit()
 
 
 def show_image(image_url):
@@ -881,7 +916,7 @@ def get_items_for_character(characterID):
     table = Table(table_name, metadata, autoload_with=engine)
 
     # Create the select statement to get all itemID and quantity for the specified characterID
-    stmt = select(table.c.item_id, table.c.quantity).where(table.c.character_id == characterID)
+    stmt = select(table.c.item_id, table.c.quantity, table.c.equipped).where(table.c.character_id == characterID)
 
     with engine.connect() as connection:
         results = connection.execute(stmt).fetchall()
@@ -889,7 +924,7 @@ def get_items_for_character(characterID):
         # Check if we have any results
         if results:
             # Convert the results into a dictionary format for easier access
-            items_dict = {row[0]: row[1] for row in results}
+            items_dict = {row[0]: {"quantity":row[1], "equipped":row[2]} for row in results}
             return items_dict
         else:
             # print(f"No items found for characterID: {characterID}")
@@ -971,16 +1006,18 @@ def get_layout_character_item(character_id):
 
 def get_layout_items_character_item(character_id):
     items_from_character = get_items_for_character(character_id)
-    # print(items_from_character)
+    print("where is this print", items_from_character)
     layout = []
     layout_iterator = 0
     layout_x = 0
     layout_y = 0
     for key in items_from_character:
+        print(key)
         # print("X: ", layout_x, " Y: ", layout_y)
         item_set = get_item_from_id(key)
+        print("this is a itemset: ",item_set)
         quantity_iterator = 0
-        while quantity_iterator < items_from_character[key]:
+        while quantity_iterator < items_from_character[key]["quantity"]:
             # dashboard_item = dashboard.Item(str(layout_iterator), layout_x, layout_y, 3, 4)
             dashboard_item = {}
             dashboard_item["i"] = str(layout_iterator)
@@ -993,6 +1030,10 @@ def get_layout_items_character_item(character_id):
             dashboard_item["item_id"] = key
             dashboard_item["image_url"] = item_set["image_url"]
             dashboard_item["description"] = item_set["description"]
+            if quantity_iterator < items_from_character[key]["equipped"]:
+                dashboard_item["equipped"] = True
+            else:
+                dashboard_item["equipped"] = False
             # print("dasaaaasdh", dashboard_item)
             layout.append(dashboard_item)
             quantity_iterator += 1
@@ -1007,67 +1048,35 @@ def get_layout_items_character_item(character_id):
     return layout
 
 
-def create_item_elements_for_character_id(characterID):
-    # layout = get_layout_character_item(characterID)
-    layout = get_layout_items_character_item(characterID)
-    # print(layout)
-    # items = get_items_for_character(characterID)
-    # print("items ", items)
-    # item_counter = 0
-    # with elements("Dashboard Items"):
-    #     with dashboard.Grid(layout, draggableHandle=".draggable"):
-    #         for key in items:
-    #             quantity_iterator = 0
-    #             while quantity_iterator < items[key]:
-    #                 # print('layout:', layout[item_counter]['i'])
-    #                 item_list = get_item_from_id(key)
-    #                 print(item_list)
-    #                 with mui.Card(key=str(item_counter), sx={"display": "flex", "flexDirection": "column"}):
-    #                     quantity_iterator += 1
-    #                     item_counter += 1
-    #                     def delete_this_item (event):
-    #                         print(event, " deleted")
-    #                         print(event.target)
-    #                     mui.CardHeader(
-    #                         title=item_list["name"],
-    #                         action=mui.IconButton(mui.icon.DeleteOutline(onClick=delete_this_item)),
-    #                         className="draggable"
-    #                     )
-    #                     mui.CardMedia(
-    #                         component="img",
-    #                         height=400,
-    #                         width=300,
-    #                         image=item_list["image_url"],
-    #                         alt=item_list["name"],
-    #                     )
-    #
-    #                     with mui.CardContent(sx={"flex": 1}):
-    #                         mui.Typography(item_list["description"])
-    if "item_board" not in st.session_state:
-        st.session_state.item_board = Dashboard()
-    if "w" not in st.session_state or st.session_state.item_added:
-        w = SimpleNamespace()
-        board = st.session_state.item_board
-        for card in layout:
-            card_name = "card{}".format(card["i"])
-            card_obj = Card(board,
-                            x=card["x"], y=card["y"], w=card["w"], h=card["h"],
-                            title=card["name"], subheader="Subheader",
-                            image=card["image_url"], alt=card["name"],
-                            content=card["description"], item_id=card["item_id"],
-                            character_id=characterID, width=300, height=400)
-            setattr(w, card_name, card_obj)
-        st.session_state.w = w
-        st.session_state.item_added = False
-        st.experimental_rerun()
-    else:
-        w = st.session_state.w
-        board = st.session_state.item_board
-        with elements("demo"):
-            with board():
-                for card_attr in vars(w):
-                    card = getattr(w, card_attr)
-                    card()
+# def create_item_elements_for_character_id(characterID):
+#     # layout = get_layout_character_item(characterID)
+#     layout = get_layout_items_character_item(characterID)
+#     # print(layout)
+#     if "item_board" not in st.session_state:
+#         st.session_state.item_board = Dashboard()
+#     if "w" not in st.session_state or st.session_state.item_added:
+#         w = SimpleNamespace()
+#         board = st.session_state.item_board
+#         for card in layout:
+#             card_name = "card{}".format(card["i"])
+#             card_obj = Card(board,
+#                             x=card["x"], y=card["y"], w=card["w"], h=card["h"],
+#                             title=card["name"], subheader="Subheader",
+#                             image=card["image_url"], alt=card["name"],
+#                             content=card["description"], item_id=card["item_id"], equipped=card["equipped"],
+#                             character_id=characterID, width=300, height=400)
+#             setattr(w, card_name, card_obj)
+#         st.session_state.w = w
+#         st.session_state.item_added = False
+#         st.experimental_rerun()
+#     else:
+#         w = st.session_state.w
+#         board = st.session_state.item_board
+#         with elements("demo"):
+#             with board():
+#                 for card_attr in vars(w):
+#                     card = getattr(w, card_attr)
+#                     card()
 
 
 def increment_stat(stat):
