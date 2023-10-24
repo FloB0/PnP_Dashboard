@@ -153,6 +153,11 @@ def create_item_elements_for_character_id(characterID):
 def decrement_or_delete_character_item(character_id, item_id, equipped):
     engine = init_connection_alchemy()
     metadata = MetaData()
+    data = {
+        "charID": character_id,
+        "itemID": item_id,
+        "equipped": equipped
+        }
 
     # Define the table based on metadata
     character_items = Table('character_items', metadata, autoload_with=engine)
@@ -173,7 +178,8 @@ def decrement_or_delete_character_item(character_id, item_id, equipped):
                 SET quantity = quantity - 1
                 WHERE character_id = :charID AND item_id = :itemID;
             """)
-        connection.execute(sql, charID=character_id, item_id=item_id)
+        print(sql)
+        connection.execute(sql, **data)
 
         # Delete rows with quantity 0
         del_stmt = delete(character_items).where(
