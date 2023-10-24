@@ -5,7 +5,7 @@ from streamlit_elements import dashboard, mui
 from contextlib import contextmanager
 from util import get_layout_items_character_item
 from util import init_connection_alchemy
-from sqlalchemy import MetaData, Table, text ,delete
+from sqlalchemy import MetaData, Table, text ,delete, update
 from streamlit import session_state as state
 from streamlit_elements import elements, sync, event
 from types import SimpleNamespace
@@ -150,41 +150,52 @@ def create_item_elements_for_character_id(characterID):
                     card()
 
 
-def decrement_or_delete_character_item(character_id, item_id, equipped):
+def decrement_or_delete_character_item (character_id, item_id, equipped):
     engine = init_connection_alchemy()
     metadata = MetaData()
-    data = {
-        "charID": character_id,
-        "itemID": item_id,
-        "equipped": equipped
-        }
-
+    print("charID: ", character_id, " itemID: ", item_id, " equipped: ", equipped)
     # Define the table based on metadata
     character_items = Table('character_items', metadata, autoload_with=engine)
 
     # Use the connection
     with engine.connect() as connection:
-        # Decrement Quantity
+        # Create an update statement
         if equipped:
-            sql = text(f"""
-                UPDATE character_items 
-                SET quantity = quantity - 1, 
-                    equipped = equipped - 1
-                WHERE character_id = :charID AND item_id = :itemID;
-            """)
+            stmt = (
+                update(character_items)
+                .where(
+                    (character_items.c.character_id == character_id) &
+                    (character_items.c.item_id == item_id)
+                    )
+                .values(
+                    quantity=character_items.c.quantity - 1,
+                    equipped=character_items.c.equipped - 1
+                    )
+            )
         else:
-            sql = text(f"""
-                UPDATE character_items
-                SET quantity = quantity - 1
-                WHERE character_id = :charID AND item_id = :itemID;
-            """)
-        print(sql)
-        connection.execute(sql, **data)
-
+            stmt = (
+                update(character_items)
+                .where(
+                    (character_items.c.character_id == character_id) &
+                    (character_items.c.item_id == item_id)
+                    )
+                .values(
+                    quantity=character_items.c.quantity - 1
+                    )
+            )
+        print("stmt ", stmt)
+        result = connection.execute(stmt)
+        print("Rows affected by update:", result.rowcount)
         # Delete rows with quantity 0
-        del_stmt = delete(character_items).where(
-            (character_items.c.character_id == character_id) &
-            (character_items.c.item_id == item_id) &
-            (character_items.c.quantity == 0)
+        del_stmt = (
+            delete(character_items)
+            .where(
+                (character_items.c.character_id == character_id) &
+                (character_items.c.item_id == item_id) &
+                (character_items.c.quantity == 0)
+                )
         )
-        connection.execute(del_stmt)
+        print("del_stmt ", del_stmt)
+        del_result = connection.execute(del_stmt)
+        print("Rows deleted:", del_result.rowcount)
+        st.session_state.item_added = True
