@@ -1006,16 +1006,16 @@ def get_layout_character_item(character_id):
 
 def get_layout_items_character_item(character_id):
     items_from_character = get_items_for_character(character_id)
-    print("where is this print", items_from_character)
+    # print("where is this print", items_from_character)
     layout = []
     layout_iterator = 0
     layout_x = 0
     layout_y = 0
     for key in items_from_character:
-        print(key)
+        # print(key)
         # print("X: ", layout_x, " Y: ", layout_y)
         item_set = get_item_from_id(key)
-        print("this is a itemset: ",item_set)
+        # print("this is a itemset: ",item_set)
         quantity_iterator = 0
         while quantity_iterator < items_from_character[key]["quantity"]:
             # dashboard_item = dashboard.Item(str(layout_iterator), layout_x, layout_y, 3, 4)

@@ -11,6 +11,57 @@ from streamlit_elements import elements, sync, event
 from types import SimpleNamespace
 
 
+def decrement_or_delete_character_item (character_id, item_id, equipped):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+    print("charID: ", character_id, " itemID: ", item_id, " equipped: ", equipped)
+    # Define the table based on metadata
+    character_items = Table('character_items', metadata, autoload_with=engine)
+
+    # Use the connection
+    with engine.connect() as connection:
+        # Create an update statement
+        if equipped:
+            stmt = (
+                update(character_items)
+                .where(
+                    (character_items.c.character_id == character_id) &
+                    (character_items.c.item_id == item_id)
+                    )
+                .values(
+                    quantity=character_items.c.quantity - 1,
+                    equipped=character_items.c.equipped - 1
+                    )
+            )
+        else:
+            stmt = (
+                update(character_items)
+                .where(
+                    (character_items.c.character_id == character_id) &
+                    (character_items.c.item_id == item_id)
+                    )
+                .values(
+                    quantity=character_items.c.quantity - 1
+                    )
+            )
+        print("stmt ", stmt)
+        result = connection.execute(stmt)
+        print("Rows affected by update:", result.rowcount)
+        # Delete rows with quantity 0
+        del_stmt = (
+            delete(character_items)
+            .where(
+                (character_items.c.character_id == character_id) &
+                (character_items.c.item_id == item_id) &
+                (character_items.c.quantity == 0)
+                )
+        )
+        print("del_stmt ", del_stmt)
+        del_result = connection.execute(del_stmt)
+        print("Rows deleted:", del_result.rowcount)
+        st.session_state.item_added = True
+        connection.commit()
+
 
 class Dashboard:
 
@@ -150,52 +201,3 @@ def create_item_elements_for_character_id(characterID):
                     card()
 
 
-def decrement_or_delete_character_item (character_id, item_id, equipped):
-    engine = init_connection_alchemy()
-    metadata = MetaData()
-    print("charID: ", character_id, " itemID: ", item_id, " equipped: ", equipped)
-    # Define the table based on metadata
-    character_items = Table('character_items', metadata, autoload_with=engine)
-
-    # Use the connection
-    with engine.connect() as connection:
-        # Create an update statement
-        if equipped:
-            stmt = (
-                update(character_items)
-                .where(
-                    (character_items.c.character_id == character_id) &
-                    (character_items.c.item_id == item_id)
-                    )
-                .values(
-                    quantity=character_items.c.quantity - 1,
-                    equipped=character_items.c.equipped - 1
-                    )
-            )
-        else:
-            stmt = (
-                update(character_items)
-                .where(
-                    (character_items.c.character_id == character_id) &
-                    (character_items.c.item_id == item_id)
-                    )
-                .values(
-                    quantity=character_items.c.quantity - 1
-                    )
-            )
-        print("stmt ", stmt)
-        result = connection.execute(stmt)
-        print("Rows affected by update:", result.rowcount)
-        # Delete rows with quantity 0
-        del_stmt = (
-            delete(character_items)
-            .where(
-                (character_items.c.character_id == character_id) &
-                (character_items.c.item_id == item_id) &
-                (character_items.c.quantity == 0)
-                )
-        )
-        print("del_stmt ", del_stmt)
-        del_result = connection.execute(del_stmt)
-        print("Rows deleted:", del_result.rowcount)
-        st.session_state.item_added = True

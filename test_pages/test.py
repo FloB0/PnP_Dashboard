@@ -1,5 +1,3 @@
-from util import *
+from classes_dashborad import decrement_or_delete_character_item
 
-names_from_primary_info = get_values_alchemy('primary_info', ['name','created_by'])
-
-print(names_from_primary_info)
+decrement_or_delete_character_item(2,2,False)
