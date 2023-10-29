@@ -5,11 +5,56 @@ from streamlit_elements import dashboard, mui
 from contextlib import contextmanager
 from util import get_layout_items_character_item
 from util import init_connection_alchemy
-from sqlalchemy import MetaData, Table, text ,delete, update
+from sqlalchemy import MetaData, Table, text ,delete, update, select
 from streamlit import session_state as state
 from streamlit_elements import elements, sync, event
 from types import SimpleNamespace
 
+
+def change_equipped (character_id, item_id, equipped):
+    engine = init_connection_alchemy()
+    metadata = MetaData()
+    data = {
+        "charID": character_id,
+        "itemID": item_id
+        }
+
+    # Define the table based on metadata
+    character_items = Table('character_items', metadata, autoload_with=engine)
+
+    with engine.connect() as connection:
+        # Ensure equipped count does not exceed quantity
+        sel_stmt = select(character_items.c.quantity, character_items.c.equipped).where(
+            (character_items.c.character_id == character_id) &
+            (character_items.c.item_id == item_id)
+            )
+        result = connection.execute(sel_stmt).fetchone()
+
+        if not result:
+            # Item not found for the character
+            return
+
+        quantity, current_equipped = result
+
+        if equipped and current_equipped > 0:
+            # Decrement equipped count
+            stmt = update(character_items).where(
+                (character_items.c.character_id == character_id) &
+                (character_items.c.item_id == item_id)
+                ).values(equipped=current_equipped - 1)
+        elif not equipped and current_equipped < quantity:
+            # Increment equipped count
+            stmt = update(character_items).where(
+                (character_items.c.character_id == character_id) &
+                (character_items.c.item_id == item_id)
+                ).values(equipped=current_equipped + 1)
+        else:
+            # Either trying to equip more than available quantity or trying to unequip when nothing is equipped
+            return
+
+        connection.execute(stmt)
+        st.session_state.item_added = True
+        connection.commit()
 
 def decrement_or_delete_character_item (character_id, item_id, equipped):
     engine = init_connection_alchemy()
@@ -138,8 +183,8 @@ class Card(Dashboard.Item):
         else:
             self._color = "primary"
 
-
-
+    def change_equipped(self):
+        change_equipped(character_id=self._character_id,item_id=self._item_id,equipped=self._equipped)
     def delete(self):
         decrement_or_delete_character_item(character_id=self._character_id,item_id=self._item_id,equipped=self._equipped)
 
@@ -165,7 +210,7 @@ class Card(Dashboard.Item):
                 mui.Typography(self._content)
 
             with mui.CardActions(disableSpacing=True):
-                mui.IconButton(mui.icon.Backpack, color=self._color)
+                mui.IconButton(mui.icon.Backpack, onClick=self.change_equipped, color=self._color)
                 mui.IconButton(mui.icon.Share)
                 mui.IconButton(mui.icon.Delete, onClick=self.delete)
 
